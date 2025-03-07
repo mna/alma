@@ -14,6 +14,7 @@ dependencies = {
 test_dependencies = {
 	"busted ~> 2.2",
 	"luacov ~> 0.16",
+	"luacov-multiple ~> 0.6",
 	"yuescript ~> 0.27",
 }
 build = {

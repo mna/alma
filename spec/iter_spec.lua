@@ -7,7 +7,7 @@ end
 do
 	return describe('Iter', function()
 		do
-			return describe('__call can be used in generic for', function()
+			describe('__call can be used in generic for', function()
 				it('works on ipairs', function()
 					local ar = {
 						1,
@@ -86,6 +86,12 @@ do
 					})
 				end)
 			end)
+		end
+		do
+			describe('step consumes the iterator one step at a time', function() end)
+		end
+		do
+			return describe('map returns an iterator that applies the transformation', function() end)
 		end
 	end)
 end

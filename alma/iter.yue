@@ -22,21 +22,26 @@ export Iter =
 	__call: => table_unpack @, 1, @n
 
 	__map: (mapfn) =>
-		f = @[1] -- get the original iterator function
+		f, s, v = @[1], @[2], @[3] -- get the original iterator function, state and var
+
+		-- the new state is a tuple of 2 items: the original state of the wrapped
+		-- iterator and the control variable (v) of the wrapped iterator.
+		ss = [s, v]
 
 		-- create the wrapping iterator function that lazily maps the values
 		ff = (s, v) ->
-			vals = table_pack(f(s, v))
-			val1 = vals[1]
+			oris, oriv = s[1], s[2]
+			vals = table_pack(f(oris, oriv))
+			oriv = s[2] = vals[1]
 
 			-- return without mapping if iteration is done
-			return table_unpack(vals, 1, vals.n) if val1 == nil
+			return table_unpack(vals, 1, vals.n) if oriv == nil
 
 			-- otherwise return the mapped values
 			mapfn table_unpack(vals, 1, vals.n)
 
 		-- return the new iterator with the mapping applied
-		Iter.of ff, table_unpack(@, 2, @n)
+		Iter.of ff, ss, table_unpack(@, 3, @n)
 
 	-- advances the iterator a single step.
 	__step: =>

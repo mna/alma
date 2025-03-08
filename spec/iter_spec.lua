@@ -84,11 +84,20 @@ do
 					end
 					assert.are.same(o, got)
 					local k, v = step(iter)
-					return assert.are.same({
+					assert.are.same({
 						[1] = 1
 					}, {
 						[k] = v
 					})
+					got = { }
+					for k, v in iter() do
+						got[k] = v
+					end
+					return assert.are.same({
+						nil,
+						2,
+						3
+					}, got)
 				end)
 			end)
 		end
@@ -227,7 +236,7 @@ do
 					assert.is_nil(i)
 					return assert.is_nil(v)
 				end)
-				return it('can modify and swap values', function()
+				it('can modify and swap values', function()
 					local o = {
 						1,
 						2,
@@ -249,6 +258,29 @@ do
 					v1, v2 = step(iter2)
 					assert.is_nil(v1)
 					return assert.is_nil(v2)
+				end)
+				return it('does consume iterator on generic for', function()
+					local o = {
+						'a',
+						'b',
+						'c'
+					}
+					local iter = Iter.of(ipairs(o))
+					local iter2 = map(iter, function(i, v)
+						return v, i
+					end)
+					local got = { }
+					for k, v in iter2() do
+						got[k] = v
+					end
+					assert.are.same({
+						a = 1,
+						b = 2,
+						c = 3
+					}, got)
+					return assert.error_matches((function()
+						return step(iter2)
+					end), "bad argument #2 to 'f' %(number expected, got nil%)")
 				end)
 			end)
 		end

@@ -26,17 +26,23 @@ Iter = {
 		return table_unpack(self, 1, self.n)
 	end,
 	__map = function(self, mapfn)
-		local f = self[1]
+		local f, s, v = self[1], self[2], self[3]
+		local ss = {
+			s,
+			v
+		}
 		local ff
 		ff = function(s, v)
-			local vals = table_pack(f(s, v))
-			local val1 = vals[1]
-			if val1 == nil then
+			local oris, oriv = s[1], s[2]
+			local vals = table_pack(f(oris, oriv))
+			oriv = vals[1]
+			s[2] = oriv
+			if oriv == nil then
 				return table_unpack(vals, 1, vals.n)
 			end
 			return mapfn(table_unpack(vals, 1, vals.n))
 		end
-		return Iter.of(ff, table_unpack(self, 2, self.n))
+		return Iter.of(ff, ss, table_unpack(self, 3, self.n))
 	end,
 	__step = function(self)
 		local f, s, v = self[1], self[2], self[3]

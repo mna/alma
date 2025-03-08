@@ -69,6 +69,12 @@ do
 			k, v = step iter
 			assert.are.same {[1]: 1}, {[k]: v}
 
+			-- iterating now returns only the last two entries
+			got = {}
+			for k, v in iter!
+				got[k] = v
+			assert.are.same [nil, 2, 3], got
+
 	do
 		<- describe 'step consumes the iterator one step at a time'
 
@@ -169,3 +175,17 @@ do
 			v1, v2 = step iter2
 			assert.is_nil v1
 			assert.is_nil v2
+
+		it 'does consume iterator on generic for', ->
+			o = ['a', 'b', 'c']
+			iter = Iter.of ipairs(o)
+			iter2 = map iter, (i, v) -> v, i
+
+			got = {}
+			for k, v in iter2!
+				got[k] = v
+			assert.are.same {a: 1, b: 2, c: 3}, got
+
+			-- calling step fails due to the iteration being fully consumed (and
+			-- ipairs raises an error on call after last)
+			assert.error_matches (-> step iter2), "bad argument #2 to 'f' %(number expected, got nil%)"

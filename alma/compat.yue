@@ -1,0 +1,11 @@
+import 'table'
+
+pack = (...) ->
+	n = select '#', ...
+	t = {...}
+	t.n = n
+	t
+
+export table_unpack = _G.unpack or table.unpack
+
+export table_pack = table.pack or pack

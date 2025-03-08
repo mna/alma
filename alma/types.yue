@@ -1,0 +1,29 @@
+import 'math'
+import 'io'
+
+export is_callable = (v) ->
+	return true if type(v) == 'function'
+	return false unless v
+
+	m = v.<>
+	if m
+		call = m.__call
+		is_callable call
+	else
+		false
+
+gtype = _G.type
+
+export type = (v) ->
+	t1 = gtype v
+
+	t2 = io.type v
+	unless t2
+		t2 = do
+			m = v.<>
+			if m and m.__name
+				m.__name
+			else if math.type and t1 == 'number'
+				math.type v
+
+	t1, t2

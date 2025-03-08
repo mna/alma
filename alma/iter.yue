@@ -1,0 +1,49 @@
+import table_pack, table_unpack from 'alma.compat'
+import is_callable, type from 'alma.types'
+
+-- step takes an iterable value and advances it by one step. Any value that has
+-- a __step metamethod is supported, such as an Iter value.
+export step = (v) ->
+	m = v.<>
+	unless m and is_callable(m.__step)
+		t1, t2 = type v
+		error "value of type #{t1}#{t2 and ' ('..t2..')'} does not support the step operation"
+
+export Iter =
+	__name: 'Iter'
+
+	-- expands the values of the iterator.
+	__call: => table_unpack @, 1, @n
+
+	__map: (mapfn) =>
+		f = @[1] -- get the original iterator function
+
+		-- create the wrapping iterator function that lazily maps the values
+		ff = (s, v) ->
+			vals = table_pack(f(s, v))
+			val1 = vals[1]
+
+			-- return without mapping if iteration is done
+			return table_unpack(vals, 1, vals.n) if val1 == nil
+
+			-- otherwise return the mapped values
+			mapfn table_unpack(vals, 1, vals.n)
+
+		-- return the new iterator with the mapping applied
+		Iter.of ff, table_unpack(@, 2, @n)
+
+	-- advances the iterator a single step.
+	__step: =>
+		f, s, v = @[1], @[2], @[3]
+		loop_vals = table_pack(f(s, v))
+		val1 = loop_vals[1]
+		@[3] = val1
+		table_unpack loop_vals, 1, loop_vals.n
+
+	-- create an Iter from the values returned by the iterator generator (e.g. the
+	-- result of 'pairs({})').
+	of: (...) ->
+		t = table_pack ...
+		t.<> = Iter
+		t
+

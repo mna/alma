@@ -14,7 +14,7 @@ rock: build
 	luarocks --lua-version=5.1 make --pack-binary-rock alma-dev-1.rockspec
 
 build:
-	yue --target=5.1 alma spec/*.yue
+	yue --target=5.1 alma spec
 
 clean:
 	find {spec,alma} -name "*.lua" -type f -delete

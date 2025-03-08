@@ -4,6 +4,11 @@ do
 	local _obj_0 = require('alma.iter')
 	step, Iter = _obj_0.step, _obj_0.Iter
 end
+local map
+do
+	local _obj_0 = require('alma.func')
+	map = _obj_0.map
+end
 do
 	return describe('Iter', function()
 		do
@@ -182,7 +187,70 @@ do
 			end)
 		end
 		do
-			return describe('map returns an iterator that applies the transformation', function() end)
+			return describe('map returns an iterator that applies the transformation', function()
+				it('double simple array values', function()
+					local o = {
+						1,
+						2,
+						3
+					}
+					local iter = Iter.of(ipairs(o))
+					local iter2 = map(iter, function(i, v)
+						return i, v * 2
+					end)
+					local got = { }
+					for i, v in iter2() do
+						got[i] = v
+					end
+					assert.are.same({
+						2,
+						4,
+						6
+					}, got)
+					got = { }
+					for i, v in iter() do
+						got[i] = v
+					end
+					return assert.are.same({
+						1,
+						2,
+						3
+					}, got)
+				end)
+				it('no-op on empty table', function()
+					local o = { }
+					local iter = Iter.of(ipairs(o))
+					local iter2 = map(iter, function(i, v)
+						return i, v * 2
+					end)
+					local i, v = step(iter2)
+					assert.is_nil(i)
+					return assert.is_nil(v)
+				end)
+				return it('can modify and swap values', function()
+					local o = {
+						1,
+						2,
+						3
+					}
+					local iter = Iter.of(ipairs(o))
+					local iter2 = map(iter, function(i, v)
+						return string.char(64 + i)
+					end)
+					local v1, v2 = step(iter2)
+					assert.equal('A', v1)
+					assert.is_nil(v2)
+					v1, v2 = step(iter2)
+					assert.equal('B', v1)
+					assert.is_nil(v2)
+					v1, v2 = step(iter2)
+					assert.equal('C', v1)
+					assert.is_nil(v2)
+					v1, v2 = step(iter2)
+					assert.is_nil(v1)
+					return assert.is_nil(v2)
+				end)
+			end)
 		end
 	end)
 end

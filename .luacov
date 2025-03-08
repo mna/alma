@@ -2,6 +2,7 @@ runreport = true
 modules = {
 	["alma.init"] = "alma/init.lua",
 	["alma.compat"] = "alma/compat.lua",
+	["alma.func"] = "alma/func.lua",
 	["alma.iter"] = "alma/iter.lua",
 	["alma.types"] = "alma/types.lua",
 }

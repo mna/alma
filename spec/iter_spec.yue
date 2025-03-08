@@ -1,5 +1,6 @@
 import 'inspect'
 import step, Iter from 'alma.iter'
+import map from 'alma.func'
 
 do
 	<- describe 'Iter'
@@ -122,3 +123,49 @@ do
 
 	do
 		<- describe 'map returns an iterator that applies the transformation'
+
+		it 'double simple array values', ->
+			o = [1, 2, 3]
+			iter = Iter.of ipairs(o)
+			iter2 = map iter, (i, v) -> i, v*2
+
+			got = {}
+			for i, v in iter2!
+				got[i] = v
+			assert.are.same [2, 4, 6], got
+
+			-- original iterator is left unchanged
+			got = {}
+			for i, v in iter!
+				got[i] = v
+			assert.are.same [1, 2, 3], got
+
+		it 'no-op on empty table', ->
+			o = {}
+			iter = Iter.of ipairs(o)
+			iter2 = map iter, (i, v) -> i, v*2
+
+			i, v = step iter2
+			assert.is_nil i
+			assert.is_nil v
+
+		it 'can modify and swap values', ->
+			o = [1, 2, 3]
+			iter = Iter.of ipairs(o)
+			iter2 = map iter, (i, v) -> string.char(64+i)
+
+			v1, v2 = step iter2
+			assert.equal 'A', v1
+			assert.is_nil v2
+
+			v1, v2 = step iter2
+			assert.equal 'B', v1
+			assert.is_nil v2
+
+			v1, v2 = step iter2
+			assert.equal 'C', v1
+			assert.is_nil v2
+
+			v1, v2 = step iter2
+			assert.is_nil v1
+			assert.is_nil v2

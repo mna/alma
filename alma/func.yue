@@ -1,0 +1,8 @@
+import is_callable, type from 'alma.types'
+
+export map = (d, fn) ->
+	m = d.<>
+	unless m and is_callable(m.__map)
+		t1, t2 = type v
+		error "value of type #{t1}#{t2 and ' ('..t2..')' or ''} does not support the map operation"
+	m.__map d, fn

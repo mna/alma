@@ -1,0 +1,75 @@
+import 'inspect'
+import step, Iter from 'alma.iter'
+
+do
+	<- describe 'Iter'
+
+	do
+		<- describe '__call can be used in generic for'
+
+		it 'works on ipairs', ->
+			ar = [1, 2, 3]
+			iter = Iter.of ipairs(ar)
+
+			got = {}
+			for i, v in iter!
+				got[i] = v
+
+			assert.are.same ar, got
+
+		it 'works on pairs', ->
+			o = {a: 1, b: true, c: {}}
+			iter = Iter.of pairs(o)
+
+			got = {}
+			for k, v in iter!
+				got[k] = v
+
+			assert.are.same o, got
+
+		it 'works on empty table', ->
+			o = {}
+			iter = Iter.of pairs(o)
+
+			got = {}
+			for k, v in iter!
+				got[k] = v
+
+			assert.are.same o, got
+
+		it 'works on gmatch', ->
+			s = 'hello yue!'
+			iter = Iter.of string.gmatch(s, '%a')
+
+			got = {}
+			for ch in iter!
+				got[] = ch
+
+			assert.are.same ['h', 'e', 'l', 'l', 'o', 'y', 'u', 'e'], got
+
+
+		it 'does not consume the Iter', ->
+			o = [1, 2, 3]
+			iter = Iter.of ipairs(o)
+
+			got = {}
+			for k, v in iter!
+				got[k] = v
+			assert.are.same o, got
+
+			-- can iterate a second time
+			got = {}
+			for k, v in iter!
+				got[k] = v
+			assert.are.same o, got
+
+			-- calling step returns the first step, since the for loop does not consume
+			-- the iterator
+			k, v = step iter
+			assert.are.same {[1]: 1}, {[k]: v}
+
+	do
+		<- describe 'step consumes the iterator one step at a time'
+
+	do
+		<- describe 'map returns an iterator that applies the transformation'

@@ -5,37 +5,37 @@ import Iter from 'alma.iter'
 
 do
 	<- describe 'is_callable'
-	it 'is false for nil', () ->
+	it 'is false for nil', ->
 		assert.is_false(is_callable nil)
 
-	it 'is false for bool', () ->
+	it 'is false for bool', ->
 		assert.is_false(is_callable true)
 
-	it 'is false for number', () ->
+	it 'is false for number', ->
 		assert.is_false(is_callable 1)
 
-	it 'is false for string', () ->
+	it 'is false for string', ->
 		assert.is_false(is_callable 'abc')
 
-	it 'is true for function', () ->
+	it 'is true for function', ->
 		assert.is_true(is_callable () ->)
 
-	it 'is false for table', () ->
+	it 'is false for table', ->
 		assert.is_false(is_callable {})
 
-	it 'is true for table with fn call', () ->
+	it 'is true for table with fn call', ->
 		t = <call>: ()->, other: 'ok'
 		assert.is_true(is_callable t)
 
-	it 'is false for table with string call', () ->
+	it 'is false for table with string call', ->
 		t = <call>: 'nope', other: 'ok'
 		assert.is_false(is_callable t)
 
-	it 'is false for table with table call', () ->
+	it 'is false for table with table call', ->
 		t = <call>: {}, other: 'ok'
 		assert.is_false(is_callable t)
 
-	it 'is true for table with callable table call', () ->
+	it 'is true for table with callable table call', ->
 		t = <call>: {<call>: () ->}, other: 'ok'
 		assert.is_true(is_callable t)
 
@@ -78,7 +78,7 @@ do
 			want: ['table', 'instance User']
 
 	for c in *cases
-		it "works for #{c.val}", () ->
+		it "works for #{c.val}", ->
 			t1, t2 = type c.val
 			assert.equal c.want[1], t1
 			assert.equal c.want[2], t2

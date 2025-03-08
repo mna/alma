@@ -8,6 +8,7 @@ export step = (v) ->
 	unless m and is_callable(m.__step)
 		t1, t2 = type v
 		error "value of type #{t1}#{t2 and ' ('..t2..')'} does not support the step operation"
+	m.__step v
 
 local Iter -- predefine so it can refer to itself
 

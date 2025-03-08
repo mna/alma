@@ -2,12 +2,15 @@ import table_pack, table_unpack from 'alma.compat'
 import is_callable, type from 'alma.types'
 
 -- step takes an iterable value and advances it by one step. Any value that has
--- a __step metamethod is supported, such as an Iter value.
+-- a __step metamethod is supported, such as an Iter value. Behavior of calling
+-- step after the iteration-ending nil value was returned as first value
+-- depends on the iterator generator function - it may raise an error, restart
+-- iteration, etc.
 export step = (v) ->
 	m = v.<>
 	unless m and is_callable(m.__step)
 		t1, t2 = type v
-		error "value of type #{t1}#{t2 and ' ('..t2..')'} does not support the step operation"
+		error "value of type #{t1}#{t2 and ' ('..t2..')' or ''} does not support the step operation"
 	m.__step v
 
 local Iter -- predefine so it can refer to itself

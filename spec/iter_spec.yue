@@ -71,5 +71,54 @@ do
 	do
 		<- describe 'step consumes the iterator one step at a time'
 
+		it 'always returns nil on empty table', ->
+			o = {}
+			iter = Iter.of pairs(o)
+
+			v = step iter
+			assert.is_nil v
+			v = step iter
+			assert.is_nil v
+
+		it 'returns all expected values of array', ->
+			o = [1, 2, 3]
+			iter = Iter.of ipairs(o)
+
+			i, v = step iter
+			assert.are.same {[1]: 1}, {[i]: v}
+			i, v = step iter
+			assert.are.same {[2]: 2}, {[i]: v}
+			i, v = step iter
+			assert.are.same {[3]: 3}, {[i]: v}
+			i, v = step iter
+			assert.is_nil i
+			assert.is_nil v
+
+		it 'returns all expected values of object', ->
+			o = {a: true, b: 123, c: {}}
+			iter = Iter.of pairs(o)
+
+			got = {}
+			while true
+				k, v = step iter
+				break if k == nil
+				got[k] = v
+
+			assert.are.same o, got
+
+			-- calling step again restarts iteration, that's due to the behavior of the
+			-- pairs iterator generator.
+			k, v = step iter
+			assert.is_string k
+
+		it 'raises an error when called with unsupported value', ->
+			s = 'abc'
+			assert.error_matches (-> step s), 'value of type string does not support the step operation'
+
+		it 'raises an error with subtype when called with unsupported value', ->
+			User = class
+			v = User!
+			assert.error_matches (-> step v), 'value of type table %(instance User%) does not support the step operation'
+
 	do
 		<- describe 'map returns an iterator that applies the transformation'

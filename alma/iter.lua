@@ -14,7 +14,7 @@ step = function(v)
 	local m = getmetatable(v)
 	if not (m and is_callable(m.__step)) then
 		local t1, t2 = type(v)
-		error("value of type " .. tostring(t1) .. tostring(t2 and ' (' .. t2 .. ')') .. " does not support the step operation")
+		error("value of type " .. tostring(t1) .. tostring(t2 and ' (' .. t2 .. ')' or '') .. " does not support the step operation")
 	end
 	return m.__step(v)
 end

@@ -1,5 +1,8 @@
 runreport = true
 modules = {
-	["elan.xtype"] = "elan/xtype.lua",
+	["alma.init"] = "alma/init.lua",
+	["alma.compat"] = "alma/compat.lua",
+	["alma.iter"] = "alma/iter.lua",
+	["alma.types"] = "alma/types.lua",
 }
 reporter = "multiple.html"

@@ -1,4 +1,7 @@
+import 'io'
+import 'inspect'
 import is_callable, type from 'alma.types'
+import Iter from 'alma.iter'
 
 do
 	<- describe 'is_callable'
@@ -35,4 +38,48 @@ do
 	it 'is true for table with callable table call', () ->
 		t = <call>: {<call>: () ->}, other: 'ok'
 		assert.is_true(is_callable t)
+
+do
+	<- describe 'type'
+
+	User = class
+	cases =
+		* val: nil
+			want: ['nil',]
+		* val: true
+			want: ['boolean',]
+		* val: false
+			want: ['boolean',]
+		* val: 1.1
+			want: ['number', 'float']
+		* val: 2
+			want: ['number', 'integer']
+		* val: 0
+			want: ['number', 'integer']
+		* val: -2
+			want: ['number', 'integer']
+		* val: -3.1415
+			want: ['number', 'float']
+		* val: 'abc'
+			want: ['string',]
+		* val: (->)
+			want: ['function',]
+		* val: coroutine.create(->)
+			want: ['thread',]
+		* val: {}
+			want: ['table',]
+		* val: io.output!
+			want: ['userdata', 'file']
+		* val: Iter.of({}, 1, 2)
+			want: ['table', 'Iter']
+		* val: User
+			want: ['table', 'class User']
+		* val: User!
+			want: ['table', 'instance User']
+
+	for c in *cases
+		it "works for #{c.val}", () ->
+			t1, t2 = type c.val
+			assert.equal c.want[1], t1
+			assert.equal c.want[2], t2
 

@@ -1,5 +1,5 @@
-import 'math'
 import 'io'
+import math_type from 'alma.compat'
 
 export is_callable = (v) ->
 	return true if type(v) == 'function'
@@ -17,13 +17,19 @@ gtype = _G.type
 export type = (v) ->
 	t1 = gtype v
 
-	t2 = io.type v
-	unless t2
+	t2 = if t1 == 'number'
+		math_type v
+	else
+		io.type v
+
+	if t1 == 'table' and not t2
 		t2 = do
 			m = v.<>
 			if m and m.__name
 				m.__name
-			else if math.type and t1 == 'number'
-				math.type v
+			else if m and m.__class
+					'instance ' .. m.__class.__name
+			else if v.__name
+				'class ' .. v.__name
 
 	t1, t2

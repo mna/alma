@@ -18,7 +18,8 @@ step = function(v)
 	end
 end
 _module_0["step"] = step
-local Iter = {
+local Iter
+Iter = {
 	__name = 'Iter',
 	__call = function(self)
 		return table_unpack(self, 1, self.n)

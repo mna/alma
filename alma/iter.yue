@@ -9,6 +9,8 @@ export step = (v) ->
 		t1, t2 = type v
 		error "value of type #{t1}#{t2 and ' ('..t2..')'} does not support the step operation"
 
+local Iter -- predefine so it can refer to itself
+
 export Iter =
 	__name: 'Iter'
 

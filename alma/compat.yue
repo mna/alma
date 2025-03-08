@@ -1,4 +1,5 @@
 import 'table'
+import 'math'
 
 pack = (...) ->
 	n = select '#', ...
@@ -6,6 +7,13 @@ pack = (...) ->
 	t.n = n
 	t
 
-export table_unpack = _G.unpack or table.unpack
+mtype = (n) ->
+	return nil unless type(n) == 'number'
+	if math.floor(n) == n
+		'integer'
+	else
+		'float'
 
+export table_unpack = _G.unpack or table.unpack
 export table_pack = table.pack or pack
+export math_type = math.type or mtype

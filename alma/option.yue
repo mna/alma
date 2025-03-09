@@ -1,0 +1,14 @@
+local Option -- predefine so it can refer to itself
+
+export Option =
+	__name: 'Option'
+
+	-- calling the value is the same as or_else
+	__call: (default) => or_else @, default
+
+	or_else: (opt, default) -> opt[1] == nil and default or opt[1]
+
+	of: (v) ->
+		t = {v}
+		t.<> = Option
+		t

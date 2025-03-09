@@ -18,8 +18,9 @@ local Iter -- predefine so it can refer to itself
 export Iter =
 	__name: 'Iter'
 
-	-- expands the values of the iterator.
-	__call: => table_unpack @, 1, @n
+	-- call generates an iterator that can be used in a Lua generic for to consume
+	-- this Iter instance.
+	__call: => step, @
 
 	__map: (mapfn) =>
 		f, s, v = @[1], @[2], @[3] -- get the original iterator function, state and var

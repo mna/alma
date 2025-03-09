@@ -23,7 +23,7 @@ local Iter
 Iter = {
 	__name = 'Iter',
 	__call = function(self)
-		return table_unpack(self, 1, self.n)
+		return step, self
 	end,
 	__map = function(self, mapfn)
 		local f, s, v = self[1], self[2], self[3]

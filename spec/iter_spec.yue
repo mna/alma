@@ -49,7 +49,7 @@ do
 			assert.are.same ['h', 'e', 'l', 'l', 'o', 'y', 'u', 'e'], got
 
 
-		it 'does not consume the Iter', ->
+		it 'consumes the Iter', ->
 			o = [1, 2, 3]
 			iter = Iter.of ipairs(o)
 
@@ -58,22 +58,7 @@ do
 				got[k] = v
 			assert.are.same o, got
 
-			-- can iterate a second time
-			got = {}
-			for k, v in iter!
-				got[k] = v
-			assert.are.same o, got
-
-			-- calling step returns the first step, since the for loop does not consume
-			-- the iterator
-			k, v = step iter
-			assert.are.same {[1]: 1}, {[k]: v}
-
-			-- iterating now returns only the last two entries
-			got = {}
-			for k, v in iter!
-				got[k] = v
-			assert.are.same [nil, 2, 3], got
+			assert.error_matches (-> step iter), "bad argument #2 to 'f' %(number expected, got nil%)"
 
 	do
 		<- describe 'step consumes the iterator one step at a time'

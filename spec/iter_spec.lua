@@ -66,7 +66,7 @@ do
 						'e'
 					}, got)
 				end)
-				return it('does not consume the Iter', function()
+				return it('consumes the Iter', function()
 					local o = {
 						1,
 						2,
@@ -78,26 +78,9 @@ do
 						got[k] = v
 					end
 					assert.are.same(o, got)
-					got = { }
-					for k, v in iter() do
-						got[k] = v
-					end
-					assert.are.same(o, got)
-					local k, v = step(iter)
-					assert.are.same({
-						[1] = 1
-					}, {
-						[k] = v
-					})
-					got = { }
-					for k, v in iter() do
-						got[k] = v
-					end
-					return assert.are.same({
-						nil,
-						2,
-						3
-					}, got)
+					return assert.error_matches((function()
+						return step(iter)
+					end), "bad argument #2 to 'f' %(number expected, got nil%)")
 				end)
 			end)
 		end

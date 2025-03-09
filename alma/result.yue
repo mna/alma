@@ -1,4 +1,4 @@
 local Result
 
 export Result =
-
+	__name: 'Result'

@@ -189,3 +189,36 @@ do
 			-- calling step fails due to the iteration being fully consumed (and
 			-- ipairs raises an error on call after last)
 			assert.error_matches (-> step iter2), "bad argument #2 to 'f' %(number expected, got nil%)"
+
+		it 'can compose multiple times', ->
+			o = {a: 1, b: 2, c: 3}
+			iter = Iter.of pairs(o)
+			iter2 = map iter, (k, v) -> string.char(string.byte(k) + 1), v * 2
+			iter3 = map iter2, (k, v) -> string.upper(k), v + 1
+
+			got = {}
+			while true
+				k, v = step iter3
+				break if k == nil
+				got[k] = v
+			assert.are.same {B: 3, C: 5, D: 7}, got
+
+			-- other iterators are left untouched
+			got = {}
+			for k, v in iter2!
+				got[k] = v
+			assert.are.same {b: 2, c: 4, d: 6}, got
+
+			got = {}
+			for k, v in iter!
+				got[k] = v
+			assert.are.same o, got
+
+		it 'raises an error when called with unsupported value', ->
+			s = 'abc'
+			assert.error_matches (-> map s, (->)), 'value of type string does not support the map operation'
+
+		it 'raises an error with subtype when called with unsupported value', ->
+			User = class
+			v = User!
+			assert.error_matches (-> map v, (->)), 'value of type table %(instance User%) does not support the map operation'

@@ -8,7 +8,7 @@ local map
 map = function(d, fn)
 	local m = getmetatable(d)
 	if not (m and is_callable(m.__map)) then
-		local t1, t2 = type(v)
+		local t1, t2 = type(d)
 		error("value of type " .. tostring(t1) .. tostring(t2 and ' (' .. t2 .. ')' or '') .. " does not support the map operation")
 	end
 	return m.__map(d, fn)

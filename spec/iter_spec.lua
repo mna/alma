@@ -259,7 +259,7 @@ do
 					assert.is_nil(v1)
 					return assert.is_nil(v2)
 				end)
-				return it('does consume iterator on generic for', function()
+				it('does consume iterator on generic for', function()
 					local o = {
 						'a',
 						'b',
@@ -281,6 +281,81 @@ do
 					return assert.error_matches((function()
 						return step(iter2)
 					end), "bad argument #2 to 'f' %(number expected, got nil%)")
+				end)
+				it('can compose multiple times', function()
+					local o = {
+						a = 1,
+						b = 2,
+						c = 3
+					}
+					local iter = Iter.of(pairs(o))
+					local iter2 = map(iter, function(k, v)
+						return string.char(string.byte(k) + 1), v * 2
+					end)
+					local iter3 = map(iter2, function(k, v)
+						return string.upper(k), v + 1
+					end)
+					local got = { }
+					while true do
+						local k, v = step(iter3)
+						if k == nil then
+							break
+						end
+						got[k] = v
+					end
+					assert.are.same({
+						B = 3,
+						C = 5,
+						D = 7
+					}, got)
+					got = { }
+					for k, v in iter2() do
+						got[k] = v
+					end
+					assert.are.same({
+						b = 2,
+						c = 4,
+						d = 6
+					}, got)
+					got = { }
+					for k, v in iter() do
+						got[k] = v
+					end
+					return assert.are.same(o, got)
+				end)
+				it('raises an error when called with unsupported value', function()
+					local s = 'abc'
+					return assert.error_matches((function()
+						return map(s, (function() end))
+					end), 'value of type string does not support the map operation')
+				end)
+				return it('raises an error with subtype when called with unsupported value', function()
+					local User
+					do
+						local _class_0
+						local _base_0 = { }
+						if _base_0.__index == nil then
+							_base_0.__index = _base_0
+						end
+						_class_0 = setmetatable({
+							__init = function() end,
+							__base = _base_0,
+							__name = "User"
+						}, {
+							__index = _base_0,
+							__call = function(cls, ...)
+								local _self_0 = setmetatable({ }, _base_0)
+								cls.__init(_self_0, ...)
+								return _self_0
+							end
+						})
+						_base_0.__class = _class_0
+						User = _class_0
+					end
+					local v = User()
+					return assert.error_matches((function()
+						return map(v, (function() end))
+					end), 'value of type table %(instance User%) does not support the map operation')
 				end)
 			end)
 		end

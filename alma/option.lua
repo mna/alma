@@ -5,8 +5,27 @@ Option = {
 	__call = function(self, default)
 		return or_else(self, default)
 	end,
-	or_else = function(opt, default)
-		return opt[1] == nil and default or opt[1]
+	__map = function(self, mapfn)
+		if Option.is_none(self) then
+			return self
+		end
+		return Option.of(mapfn(self[1]))
+	end,
+	or_else = function(self, default)
+		return self[1] == nil and default or self[1]
+	end,
+	is_some = function(self)
+		return not self:is_none()
+	end,
+	is_none = function(self)
+		return self[1] == nil
+	end,
+	flatten = function(self)
+		if getmetatable(self[1]) == Option then
+			return self[1]
+		else
+			return self
+		end
 	end,
 	of = function(v)
 		local t = {

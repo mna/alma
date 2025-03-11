@@ -12,7 +12,7 @@ Option = {
 		return Option.of(mapfn(self[1]))
 	end,
 	or_else = function(self, default)
-		return self[1] == nil and default or self[1]
+		return Option.is_none(self) and default or self[1]
 	end,
 	is_some = function(self)
 		return not self:is_none()

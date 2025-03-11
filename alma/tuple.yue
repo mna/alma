@@ -1,0 +1,4 @@
+local Tuple -- predefine so it can refer to itself
+
+export Tuple =
+	__name: 'Tuple'

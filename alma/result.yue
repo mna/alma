@@ -1,4 +1,29 @@
 local Result
 
+Ok, Err = 0, -1
+
 export Result =
 	__name: 'Result'
+
+	-- calling the value is the same as or_else
+	__call: (default) => or_else @, default
+
+	or_else: (default) => Result.is_err(@) and default or @[1]
+	is_ok: => @tag == Ok
+	is_err: => @tag == Err
+
+	flatten: =>
+		if Result.is_ok(@) and @[1].<> == Result
+			@[1]
+		else
+			@
+
+	ok: (v) ->
+		t = {v, tag: Ok}
+		t.<> = Result
+		t
+	
+	err: (v) ->
+		t = {v, tag: Err}
+		t.<> = Result
+		t

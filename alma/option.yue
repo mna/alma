@@ -10,9 +10,10 @@ export Option =
 		return @ if Option.is_none(@)
 		Option.of mapfn(@[1])
 
-	or_else: (default) => @[1] == nil and default or @[1]
+	or_else: (default) => Option.is_none(@) and default or @[1]
 	is_some: => not @is_none!
 	is_none: => @[1] == nil
+
 	flatten: =>
 		if @[1].<> == Option
 			@[1]

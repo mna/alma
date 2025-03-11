@@ -28,4 +28,6 @@ jobs:
         run: |
           luarocks install busted
           luarocks install inspect
-          busted
+
+      - name: Run tests
+        run: busted

@@ -1,0 +1,28 @@
+name: test
+on: [push, pull_request]
+
+jobs:
+  busted:
+    if: contains(github.event.head_commit.message, '(CI)')
+
+    strategy:
+      matrix:
+        lua-version: ["5.1", "5.2", "5.3", "5.4", "luajit"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Lua
+        uses: leafo/gh-actions-lua@v11
+        with:
+          luaVersion: ${{ matrix.lua-version }}
+
+      - name: Install LuaRocks
+        uses: leafo/gh-actions-luarocks@v5
+        with:
+          luarocksVersion: "3.11.1"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: busted

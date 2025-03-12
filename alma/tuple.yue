@@ -1,4 +1,22 @@
+import table_pack, table_unpack from 'alma.compat'
+
 local Tuple -- predefine so it can refer to itself
 
 export Tuple =
 	__name: 'Tuple'
+
+	-- calling the value unpacks the tuple
+	__call: => table_unpack @, 1, @n
+
+	__map: (mapfn) =>
+		vs = []
+		for i in 1, @n
+			vs[i] = mapfn @[i]
+
+		Tuple.of table_unpack(vs, 1, @n)
+
+	-- create a Tuple from the provided values.
+	of: (...) ->
+		t = table_pack ...
+		t.<> = Tuple
+		t

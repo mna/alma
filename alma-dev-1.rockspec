@@ -16,7 +16,7 @@ test_dependencies = {
 	"inspect ~> 3.1",
 	"luacov ~> 0.16",
 	"luacov-multiple ~> 0.6",
-	"yuescript ~> 0.27",
+	"moonscript ~> 0.5",
 }
 test = {
 	type = "busted",

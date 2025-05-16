@@ -1,22 +1,21 @@
 # Alma, a Fantasy Land compatible functional library for Lua
 
 Must implement:
-
-* sanctuary-type-identifiers
-* sanctuary-show
-* sanctuary-type-classes
-* sanctuary-either
-* sanctuary-def
-* sanctuary-maybe
-* sanctuary-identity
+* [ ] sanctuary-type-identifiers
+* [ ] sanctuary-show
+* [ ] sanctuary-type-classes
+* [ ] sanctuary-either
+* [ ] sanctuary-def
+* [ ] sanctuary-maybe
+* [ ] sanctuary-identity
 
 Probably implement:
-* tuples
-* iterators
+* [ ] tuples
+* [ ] iterators
 
 Maybe implement:
-* sanctuary-set
-* sanctuary-descending
-* sanctuary-useless
-* sanctuary-pair
-* sanctuary-int
+* [ ] sanctuary-set
+* [ ] sanctuary-descending
+* [ ] sanctuary-useless
+* [ ] sanctuary-pair
+* [ ] sanctuary-int

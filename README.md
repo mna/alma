@@ -2,11 +2,11 @@
 
 Must implement:
 
-* sanctuary-type-classes
-* sanctuary-def
 * sanctuary-type-identifiers
 * sanctuary-show
+* sanctuary-type-classes
 * sanctuary-either
+* sanctuary-def
 * sanctuary-maybe
 * sanctuary-identity
 

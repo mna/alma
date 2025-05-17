@@ -1,5 +1,6 @@
 local assert = require('luassert')
 local inspect = require('inspect')
+local _ = inspect
 describe('table_pack, table_unpack', function()
   local table_pack, table_unpack
   setup(function()

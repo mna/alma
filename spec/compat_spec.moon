@@ -1,5 +1,6 @@
 assert = require 'luassert'
 inspect = require 'inspect'
+_ = inspect -- don't complain if unused
 
 describe 'table_pack, table_unpack', ->
 	local table_pack, table_unpack

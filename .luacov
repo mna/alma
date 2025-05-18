@@ -1,5 +1,0 @@
-runreport = true
-modules = {
-	["compat"] = "alma/compat/init.lua",
-}
-reporter = "multiple.html"

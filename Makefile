@@ -8,8 +8,8 @@ test: build
 
 testcov: build
 	# TODO: fix test coverage
-	busted --loaders=lua --coverage ${BUSTED_ARGS}
-	xdg-open luacov_html/index.html
+	# busted --loaders=lua --coverage ${BUSTED_ARGS}
+	# xdg-open luacov_html/index.html
 
 rock: build
 	luarocks --lua-version=5.1 make --pack-binary-rock alma-dev-1.rockspec

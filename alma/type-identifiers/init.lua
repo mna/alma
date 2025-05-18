@@ -1,7 +1,9 @@
+local meta = require('alma.meta')
 local identifier_of
 identifier_of = function(x)
-  local meta = getmetatable((x))
-  return (meta ~= nil and (type((meta['@@type']))) == 'string') and meta['@@type'] or type((x))
+  return meta.get_metavalue(x, '@@type', function(v)
+    return type(v) == 'string'
+  end) or type(x)
 end
 local parse_identifier
 parse_identifier = function(s)

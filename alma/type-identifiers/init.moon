@@ -1,8 +1,8 @@
+meta = require 'alma.meta'
+
 identifier_of = (x) ->
-	meta = getmetatable (x)
-	(meta != nil and (type (meta['@@type'])) == 'string') and
-		meta['@@type'] or
-		type (x)
+	meta.get_metavalue(x, '@@type', (v) -> type(v) == 'string') or
+		type(x)
 
 parse_identifier = (s) ->
 	-- find last index of '/'

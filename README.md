@@ -1,7 +1,7 @@
 # Alma, a Fantasy Land compatible functional library for Lua
 
 Must implement:
-* [ ] sanctuary-type-identifiers
+* [x] sanctuary-type-identifiers
 * [ ] sanctuary-show
 * [ ] sanctuary-type-classes
 * [ ] sanctuary-either

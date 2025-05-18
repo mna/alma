@@ -7,7 +7,8 @@ test: build
 	busted --loaders moonscript ${BUSTED_ARGS}
 
 testcov: build
-	busted --loaders moonscript --coverage ${BUSTED_ARGS}
+	# TODO: fix test coverage
+	busted --loaders=lua --coverage ${BUSTED_ARGS}
 	xdg-open luacov_html/index.html
 
 rock: build

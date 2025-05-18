@@ -2,7 +2,7 @@ local assert = require('luassert')
 local inspect = require('inspect')
 local _ = inspect
 describe('identifier_of', function()
-  local identifier_of, Identity
+  local identifier_of, Identity, Nothing, Just
   setup(function()
     identifier_of = require('alma.type-identifiers').identifier_of
     Identity = function(x)
@@ -10,6 +10,21 @@ describe('identifier_of', function()
         value = x
       }, {
         ['@@type'] = 'my-package/Identity'
+      })
+    end
+    Nothing = function()
+      return setmetatable({
+        is_nothing = true
+      }, {
+        ['@@type'] = 'my-package/Maybe'
+      })
+    end
+    Just = function(x)
+      return setmetatable({
+        is_nothing = false,
+        value = x
+      }, {
+        ['@@type'] = 'my-package/Maybe'
       })
     end
   end)
@@ -58,6 +73,26 @@ describe('identifier_of', function()
       {
         getmetatable(Identity(42)),
         'table'
+      },
+      {
+        setmetatable({ }, {
+          ['@@type'] = nil
+        }),
+        'table'
+      },
+      {
+        setmetatable({ }, {
+          ['@@type'] = ''
+        }),
+        ''
+      },
+      {
+        Nothing(),
+        'my-package/Maybe'
+      },
+      {
+        Just(0),
+        'my-package/Maybe'
       }
     }
     for _, case in ipairs((cases)) do

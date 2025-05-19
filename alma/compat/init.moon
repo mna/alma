@@ -10,7 +10,10 @@ pack = (...) ->
 mtype = (n) ->
 	return nil unless type(n) == 'number'
 	if math.floor(n) == n
-		'integer'
+		if string.find(string.format('%f', n), 'inf')
+			'float'
+		else
+			'integer'
 	else
 		'float'
 

@@ -15,7 +15,11 @@ mtype = function(n)
     return nil
   end
   if math.floor(n) == n then
-    return 'integer'
+    if string.find(string.format('%f', n), 'inf') then
+      return 'float'
+    else
+      return 'integer'
+    end
   else
     return 'float'
   end

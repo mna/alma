@@ -1,15 +1,63 @@
+debug = require 'debug'
+string = require 'string'
+table = require 'table'
 meta = require 'alma.meta'
+{:math_type} = require 'alma.compat'
 
 show_detect_circular = (x, seen) ->
 	if x == nil then return 'nil'
+
 	do
 		metafn = meta.get_metavalue(x, '@@show', meta.is_callable)
 		if metafn then return metafn(x)
-	if seen[x] then return '<Circular>'
+
+	if seen[x] then return '<circular>'
 
 	switch type(x) -- note that nil is already handled
 		when 'boolean'
+			x and 'true' or 'false'
 
+		when 'number'
+			if math_type(x) == 'integer'
+				string.format('%d', x)
+			else
+				string.format('%g', x)
+
+		when 'string'
+			string.format('%q', x)
+
+		when 'table'
+
+		when 'function'
+			finfo = debug.getinfo(x)
+
+			parts = {"function #{finfo.name or ''}("}
+			for i = 1, finfo.nparams
+				if i > 1 then
+					table.insert(parts, ', ')
+				table.insert(parts, string.format('arg%d', i))
+
+			if finfo.isvararg
+				if finfo.nparams > 0 then
+					table.insert(parts, ', ')
+				table.insert(parts, '...')
+			table.insert(parts, ')\n')
+
+			table.insert(parts, string.format("  -- %s function (%p)\n", finfo.what, x))
+			if finfo.linedefined > 0
+				table.insert(parts, string.format('  -- at %s:%d\n', finfo.short_src, finfo.linedefined))
+			table.insert(parts, "end")
+
+			table.concat(parts)
+
+		when 'thread'
+			"<thread #{string.format('%p', x)}>"
+
+		when 'userdata'
+			"<userdata #{string.format('%p', x)}>"
+
+		else
+			"<unknown type: #{type(x)}>"
 
 show = (x) ->
 	show_detect_circular(x, {})

@@ -90,3 +90,12 @@ describe 'math_type', ->
 
 	it 'is float for -3.567', ->
 		assert.equal 'float', math_type(-3.567)
+
+	it 'is float for infinity', ->
+		assert.equal 'float', math_type(1/0)
+
+	it 'is float for -infinity', ->
+		assert.equal 'float', math_type(-1/0)
+
+	it 'is float for NaN', ->
+		assert.equal 'float', math_type(0/0)

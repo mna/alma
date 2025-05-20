@@ -68,5 +68,5 @@ describe 'parse_identifier', ->
 			{'package////@3@2@1@1', TypeIdentifier('package///', '@3@2@1', 1)},
 		}
 		for _, case in ipairs (cases)
-			got = parse_identifier (case[1])
+			got = parse_identifier(case[1])
 			assert.are.same case[2], got

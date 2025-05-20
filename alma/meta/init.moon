@@ -7,6 +7,6 @@ get_metavalue = (x, field, predicate) ->
 
 is_callable = (v) ->
 	type(v) == 'function' or
-		(meta.get_metavalue(v, '__call', is_callable)) != nil
+		(get_metavalue(v, '__call', is_callable)) != nil
 
 {:get_metavalue, :is_callable}

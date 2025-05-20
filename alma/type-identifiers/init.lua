@@ -1,3 +1,4 @@
+local string = require('string')
 local meta = require('alma.meta')
 local identifier_of
 identifier_of = function(x)

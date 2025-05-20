@@ -1,6 +1,7 @@
 debug = require 'debug'
 string = require 'string'
 table = require 'table'
+
 meta = require 'alma.meta'
 {:math_type} = require 'alma.compat'
 
@@ -21,12 +22,41 @@ show_detect_circular = (x, seen) ->
 			if math_type(x) == 'integer'
 				string.format('%d', x)
 			else
-				string.format('%g', x)
+				string.format('%.10g', x)
 
 		when 'string'
 			string.format('%q', x)
 
 		when 'table'
+			seen[x] = true
+			array_up_to = 0
+
+			parts = {"{"}
+
+			-- start with the array part
+			for i, v in ipairs(x)
+				if i > 1 then
+					table.insert(parts, ', ')
+
+				array_up_to = i
+				table.insert(parts, show_detect_circular(v, seen))
+
+			-- continue with the hash part, ignoring keys covered by the array
+			needs_comma = array_up_to > 0
+			for k, v in pairs(x)
+				if math_type(k) == 'integer' and k > 0 and k <= array_up_to
+					continue
+
+				if needs_comma
+					table.insert(parts, ', ')
+
+				table.insert(parts, string.format('[%s] = ', show_detect_circular(k, seen)))
+				table.insert(parts, show_detect_circular(v, seen))
+				needs_comma = true
+
+			table.insert(parts, "}")
+			seen[x] = nil
+			table.concat(parts)
 
 		when 'function'
 			finfo = debug.getinfo(x)

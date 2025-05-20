@@ -1,3 +1,5 @@
+string = require 'string'
+
 meta = require 'alma.meta'
 
 identifier_of = (x) ->

@@ -182,7 +182,7 @@ return describe('parse_identifier', function()
       }
     }
     for _, case in ipairs((cases)) do
-      local got = parse_identifier((case[1]))
+      local got = parse_identifier(case[1])
       assert.are.same(case[2], got)
     end
   end)

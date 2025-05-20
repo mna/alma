@@ -5,7 +5,7 @@ get_metavalue = function(x, field, predicate)
 end
 local is_callable
 is_callable = function(v)
-  return type(v) == 'function' or (meta.get_metavalue(v, '__call', is_callable)) ~= nil
+  return type(v) == 'function' or (get_metavalue(v, '__call', is_callable)) ~= nil
 end
 return {
   get_metavalue = get_metavalue,

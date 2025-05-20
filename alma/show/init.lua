@@ -1,3 +1,6 @@
+local debug = require('debug')
+local string = require('string')
+local table = require('table')
 local meta = require('alma.meta')
 local math_type
 math_type = require('alma.compat').math_type
@@ -13,15 +16,85 @@ show_detect_circular = function(x, seen)
     end
   end
   if seen[x] then
-    return '<Circular>'
+    return '<circular>'
   end
   local _exp_0 = type(x)
   if 'boolean' == _exp_0 then
     return x and 'true' or 'false'
   elseif 'number' == _exp_0 then
-    return 'todo'
+    if math_type(x) == 'integer' then
+      return string.format('%d', x)
+    else
+      return string.format('%.10g', x)
+    end
+  elseif 'string' == _exp_0 then
+    return string.format('%q', x)
+  elseif 'table' == _exp_0 then
+    seen[x] = true
+    local array_up_to = 0
+    local parts = {
+      "{"
+    }
+    for i, v in ipairs(x) do
+      if i > 1 then
+        table.insert(parts, ', ')
+      end
+      array_up_to = i
+      table.insert(parts, show_detect_circular(v, seen))
+    end
+    local needs_comma = array_up_to > 0
+    for k, v in pairs(x) do
+      local _continue_0 = false
+      repeat
+        if math_type(k) == 'integer' and k > 0 and k <= array_up_to then
+          _continue_0 = true
+          break
+        end
+        if needs_comma then
+          table.insert(parts, ', ')
+        end
+        table.insert(parts, string.format('[%s] = ', show_detect_circular(k, seen)))
+        table.insert(parts, show_detect_circular(v, seen))
+        needs_comma = true
+        _continue_0 = true
+      until true
+      if not _continue_0 then
+        break
+      end
+    end
+    table.insert(parts, "}")
+    seen[x] = nil
+    return table.concat(parts)
+  elseif 'function' == _exp_0 then
+    local finfo = debug.getinfo(x)
+    local parts = {
+      "function " .. tostring(finfo.name or '') .. "("
+    }
+    for i = 1, finfo.nparams do
+      if i > 1 then
+        table.insert(parts, ', ')
+      end
+      table.insert(parts, string.format('arg%d', i))
+    end
+    if finfo.isvararg then
+      if finfo.nparams > 0 then
+        table.insert(parts, ', ')
+      end
+      table.insert(parts, '...')
+    end
+    table.insert(parts, ')\n')
+    table.insert(parts, string.format("  -- %s function (%p)\n", finfo.what, x))
+    if finfo.linedefined > 0 then
+      table.insert(parts, string.format('  -- at %s:%d\n', finfo.short_src, finfo.linedefined))
+    end
+    table.insert(parts, "end")
+    return table.concat(parts)
+  elseif 'thread' == _exp_0 then
+    return "<thread " .. tostring(string.format('%p', x)) .. ">"
+  elseif 'userdata' == _exp_0 then
+    return "<userdata " .. tostring(string.format('%p', x)) .. ">"
   else
-    return 'todo'
+    return "<unknown type: " .. tostring(type(x)) .. ">"
   end
 end
 local show

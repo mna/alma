@@ -55,6 +55,8 @@ describe 'show', ->
 			{{1, t: circular_tbl}, '{1, ["t"] = {<circular>}}'},
 			{{a: true, [false]: 3}, '{["a"] = true, [false] = 3}'},
 			{{x: {y: {z: "ok"}}}, '{["x"] = {["y"] = {["z"] = "ok"}}}'},
+			{{x: 1, y: 2, z: 3}, '{["x"] = 1, ["y"] = 2, ["z"] = 3}'},
+			{{y: 2, z: 3, x: 1}, '{["x"] = 1, ["y"] = 2, ["z"] = 3}'},
 
 			{thread, string.format('<thread %p>', thread)},
 			{userdata, string.format('<userdata %p>', userdata)},

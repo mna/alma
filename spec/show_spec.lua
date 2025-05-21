@@ -164,6 +164,22 @@ return describe('show', function()
         '{["x"] = {["y"] = {["z"] = "ok"}}}'
       },
       {
+        {
+          x = 1,
+          y = 2,
+          z = 3
+        },
+        '{["x"] = 1, ["y"] = 2, ["z"] = 3}'
+      },
+      {
+        {
+          y = 2,
+          z = 3,
+          x = 1
+        },
+        '{["x"] = 1, ["y"] = 2, ["z"] = 3}'
+      },
+      {
         thread,
         string.format('<thread %p>', thread)
       },

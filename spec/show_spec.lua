@@ -180,12 +180,96 @@ return describe('show', function()
         '{["x"] = 1, ["y"] = 2, ["z"] = 3}'
       },
       {
+        {
+          x = 1,
+          'a',
+          'b',
+          'c'
+        },
+        '{"a", "b", "c", ["x"] = 1}'
+      },
+      {
+        {
+          'a',
+          'b',
+          'c',
+          [5] = 'd'
+        },
+        '{"a", "b", "c", [5] = "d"}'
+      },
+      {
+        {
+          'a',
+          'b',
+          'c',
+          [0] = 'd'
+        },
+        '{"a", "b", "c", [0] = "d"}'
+      },
+      {
+        {
+          'a',
+          'b',
+          'c',
+          [-1] = 'd'
+        },
+        '{"a", "b", "c", [-1] = "d"}'
+      },
+      {
         thread,
         string.format('<thread %p>', thread)
       },
       {
         userdata,
         string.format('<userdata %p>', userdata)
+      },
+      {
+        {
+          ['@@show'] = true
+        },
+        '{["@@show"] = true}'
+      },
+      {
+        setmetatable({
+          'a',
+          x = 1
+        }, {
+          ['@@show'] = function()
+            return '<custom>'
+          end
+        }),
+        '<custom>'
+      },
+      {
+        setmetatable({
+          'a',
+          x = 1
+        }, {
+          ['@@show'] = setmetatable({ }, {
+            __call = function()
+              return '<custom>'
+            end
+          })
+        }),
+        '<custom>'
+      },
+      {
+        setmetatable({
+          'a',
+          x = 1
+        }, {
+          ['@@show'] = true
+        }),
+        '{"a", ["x"] = 1}'
+      },
+      {
+        setmetatable({
+          'a',
+          x = 1
+        }, {
+          ['@@show'] = { }
+        }),
+        '{"a", ["x"] = 1}'
       },
       {
         luafn0,

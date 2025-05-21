@@ -57,9 +57,23 @@ describe 'show', ->
 			{{x: {y: {z: "ok"}}}, '{["x"] = {["y"] = {["z"] = "ok"}}}'},
 			{{x: 1, y: 2, z: 3}, '{["x"] = 1, ["y"] = 2, ["z"] = 3}'},
 			{{y: 2, z: 3, x: 1}, '{["x"] = 1, ["y"] = 2, ["z"] = 3}'},
+			{{x: 1, 'a', 'b', 'c'}, '{"a", "b", "c", ["x"] = 1}'},
+			{{'a', 'b', 'c', [5]: 'd'}, '{"a", "b", "c", [5] = "d"}'},
+			{{'a', 'b', 'c', [0]: 'd'}, '{"a", "b", "c", [0] = "d"}'},
+			{{'a', 'b', 'c', [-1]: 'd'}, '{"a", "b", "c", [-1] = "d"}'},
 
 			{thread, string.format('<thread %p>', thread)},
 			{userdata, string.format('<userdata %p>', userdata)},
+
+			{{'@@show': true}, '{["@@show"] = true}'},
+			{setmetatable({'a', x: 1}, {'@@show': -> '<custom>'}), '<custom>'},
+			{setmetatable({'a', x: 1}, {'@@show': setmetatable({}, {__call: -> '<custom>'})}), '<custom>'},
+			{setmetatable({'a', x: 1}, {'@@show': true}), '{"a", ["x"] = 1}'},
+			{setmetatable({'a', x: 1}, {'@@show': {}}), '{"a", ["x"] = 1}'},
+			-- On Lua 5.3.5+, the __call metamethod can itself be a "callable" metamethod,
+			-- but on LuaJIT this must be a function, not a "callable". The alma library
+			-- will attempt to call it if it is a callable, but it will fail on LuaJIT.
+			-- {setmetatable({'a', x: 1}, {'@@show': setmetatable({}, {__call: setmetatable({}, {__call: -> '<custom>'})})}), '<custom>'},
 
 			{luafn0, string.format('function ()
   -- Lua function (%p)

@@ -43,6 +43,7 @@ show_detect_circular = function(x, seen)
       table.insert(parts, show_detect_circular(v, seen))
     end
     local needs_comma = array_up_to > 0
+    local key_vals = { }
     for k, v in pairs(x) do
       local _continue_0 = false
       repeat
@@ -50,17 +51,19 @@ show_detect_circular = function(x, seen)
           _continue_0 = true
           break
         end
-        if needs_comma then
-          table.insert(parts, ', ')
-        end
-        table.insert(parts, string.format('[%s] = ', show_detect_circular(k, seen)))
-        table.insert(parts, show_detect_circular(v, seen))
-        needs_comma = true
+        table.insert(key_vals, string.format('[%s] = %s', show_detect_circular(k, seen), show_detect_circular(v, seen)))
         _continue_0 = true
       until true
       if not _continue_0 then
         break
       end
+    end
+    if #key_vals > 0 then
+      table.sort(key_vals)
+      if needs_comma then
+        table.insert(parts, ', ')
+      end
+      table.insert(parts, table.concat(key_vals, ', '))
     end
     table.insert(parts, "}")
     seen[x] = nil

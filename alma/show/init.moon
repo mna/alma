@@ -43,16 +43,21 @@ show_detect_circular = (x, seen) ->
 
 			-- continue with the hash part, ignoring keys covered by the array
 			needs_comma = array_up_to > 0
+			key_vals = {}
 			for k, v in pairs(x)
 				if math_type(k) == 'integer' and k > 0 and k <= array_up_to
 					continue
+				table.insert(key_vals, string.format('[%s] = %s', 
+					show_detect_circular(k, seen), show_detect_circular(v, seen)))
 
+			if #key_vals > 0
+				-- sort by keys
+				table.sort(key_vals)
+
+				-- add the hash part to the table parts
 				if needs_comma
 					table.insert(parts, ', ')
-
-				table.insert(parts, string.format('[%s] = ', show_detect_circular(k, seen)))
-				table.insert(parts, show_detect_circular(v, seen))
-				needs_comma = true
+				table.insert(parts, table.concat(key_vals, ', '))
 
 			table.insert(parts, "}")
 			seen[x] = nil

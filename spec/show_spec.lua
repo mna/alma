@@ -149,7 +149,7 @@ return describe('show', function()
       {
         {
           a = true,
-          ["false"] = 3
+          [false] = 3
         },
         '{["a"] = true, [false] = 3}'
       },

@@ -53,7 +53,7 @@ describe 'show', ->
 			{{1, 'b', true, 4}, '{1, "b", true, 4}'},
 			{{circular_tbl}, '{{<circular>}}'},
 			{{1, t: circular_tbl}, '{1, ["t"] = {<circular>}}'},
-			{{a: true, false: 3}, '{["a"] = true, [false] = 3}'},
+			{{a: true, [false]: 3}, '{["a"] = true, [false] = 3}'},
 			{{x: {y: {z: "ok"}}}, '{["x"] = {["y"] = {["z"] = "ok"}}}'},
 
 			{thread, string.format('<thread %p>', thread)},

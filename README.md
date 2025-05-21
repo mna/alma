@@ -2,7 +2,7 @@
 
 Must implement:
 * [x] sanctuary-type-identifiers
-* [ ] sanctuary-show
+* [x] sanctuary-show
 * [ ] sanctuary-type-classes
 * [ ] sanctuary-either
 * [ ] sanctuary-def

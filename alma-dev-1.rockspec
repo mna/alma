@@ -23,5 +23,11 @@ test = {
 }
 build = {
 	type = "builtin",
-	modules = {}
+	modules = {
+		["alma.compat"] = "alma/compat/init.lua",
+		["alma.meta"] = "alma/meta/init.lua",
+		["alma.show"] = "alma/show/init.lua",
+		["alma.type-classes"] = "alma/type-classes/init.lua",
+		["alma.type-identifiers"] = "alma/type-identifiers/init.lua",
+	}
 }

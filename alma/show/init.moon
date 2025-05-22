@@ -65,6 +65,7 @@ show_detect_circular = (x, seen) ->
 
 		when 'function'
 			finfo = debug.getinfo(x)
+			finfo.nparams = 0 unless finfo.nparams
 
 			parts = {"function #{finfo.name or ''}("}
 			for i = 1, finfo.nparams

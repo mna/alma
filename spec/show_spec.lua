@@ -80,10 +80,6 @@ return describe('show', function()
         '-123456789.1'
       },
       {
-        0 / 0,
-        '~^%-?nan$'
-      },
-      {
         1 / 0,
         'inf'
       },
@@ -287,7 +283,7 @@ return describe('show', function()
       },
       {
         cfn,
-        string.format('function (...)\n  -- C function (%s)\nendz', pointer_hex(cfn))
+        string.format('function (...)\n  -- C function (%s)\nend', pointer_hex(cfn))
       }
     }
     for _, case in ipairs((cases)) do

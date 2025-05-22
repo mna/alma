@@ -73,6 +73,9 @@ show_detect_circular = function(x, seen)
     return table.concat(parts)
   elseif 'function' == _exp_0 then
     local finfo = debug.getinfo(x)
+    if not (finfo.nparams) then
+      finfo.nparams = 0
+    end
     local parts = {
       "function " .. tostring(finfo.name or '') .. "("
     }

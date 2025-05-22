@@ -12,9 +12,12 @@ luafn2 = function(a, b, ...) end
 local luafnvar
 luafnvar = function(...) end
 return describe('show', function()
-  local show
+  local show, lua_version, lua_jit
   setup(function()
     show = require('alma.show').show
+    local maj, min = string.match(_G._VERSION, 'Lua (%d+)%.(%d+)')
+    lua_version = tonumber(maj .. min)
+    lua_jit = (type(jit) == 'table')
   end)
   return it('returns as expected', function()
     local thread = coroutine.create(function() end)
@@ -64,6 +67,20 @@ return describe('show', function()
         '3.14156'
       },
       {
+        1.4569823e12,
+        '1456982300000',
+        function()
+          return lua_version < 54
+        end
+      },
+      {
+        1.4569823e12,
+        '1.4569823e12',
+        function()
+          return lua_version >= 54
+        end
+      },
+      {
         12.3456789012,
         '12.3456789'
       },
@@ -78,6 +95,10 @@ return describe('show', function()
       {
         -123456789.123456,
         '-123456789.1'
+      },
+      {
+        0 / 0,
+        'nan'
       },
       {
         1 / 0,
@@ -271,29 +292,55 @@ return describe('show', function()
       },
       {
         luafn1,
-        string.format('function (arg1)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:9\nend', pointer_hex(luafn1))
+        string.format('function (arg1)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:9\nend', pointer_hex(luafn1)),
+        function()
+          return lua_version > 51 or lua_jit
+        end
       },
       {
         luafn2,
-        string.format('function (arg1, arg2, ...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:11\nend', pointer_hex(luafn2))
+        string.format('function (arg1, arg2, ...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:11\nend', pointer_hex(luafn2)),
+        function()
+          return lua_version > 51 or lua_jit
+        end
       },
       {
         luafnvar,
-        string.format('function (...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:13\nend', pointer_hex(luafnvar))
+        string.format('function (...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:13\nend', pointer_hex(luafnvar)),
+        function()
+          return lua_version > 51 or lua_jit
+        end
       },
       {
         cfn,
-        string.format('function (...)\n  -- C function (%s)\nend', pointer_hex(cfn))
+        string.format('function (...)\n  -- C function (%s)\nend', pointer_hex(cfn)),
+        function()
+          return lua_version > 51 or lua_jit
+        end
       }
     }
     for _, case in ipairs((cases)) do
-      local got = show(case[1])
-      local want = case[2]
-      if string.sub(want, 1, 1) == '~' then
-        want = string.sub(want, 2)
-        assert.matches(want, got)
-      else
-        assert.are.equal(got, want)
+      local _continue_0 = false
+      repeat
+        local got = show(case[1])
+        local want = case[2]
+        local predicate = case[3]
+        if predicate then
+          if not (predicate()) then
+            _continue_0 = true
+            break
+          end
+        end
+        if string.sub(want, 1, 1) == '~' then
+          want = string.sub(want, 2)
+          assert.matches(want, got)
+        else
+          assert.are.equal(got, want)
+        end
+        _continue_0 = true
+      until true
+      if not _continue_0 then
+        break
       end
     end
   end)

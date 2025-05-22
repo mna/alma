@@ -10,10 +10,13 @@ luafn2 = (a, b, ...) -> -- do not move
 luafnvar = (...) -> -- do not move
 
 describe 'show', ->
-	local show
+	local show, lua_version, lua_jit
 
 	setup ->
 		{:show} = require 'alma.show'
+		maj, min = string.match(_G._VERSION, 'Lua (%d+)%.(%d+)')
+		lua_version = tonumber(maj .. min) -- e.g. 54 for 5.4, 51 for 5.1 and JIT
+		lua_jit = (type(jit) == 'table')
 
 	it 'returns as expected', ->
 		thread = coroutine.create(->)
@@ -36,12 +39,13 @@ describe 'show', ->
 
 			{1.1, '1.1'},
 			{3.14156, '3.14156'},
-			--{1.4569823e12, '1456982300000'}, -- not consistent across versions
+			{1.4569823e12, '1456982300000', -> lua_version < 54},
+			{1.4569823e12, '1.4569823e12', -> lua_version >= 54},
 			{12.3456789012, '12.3456789'},
 			{12345.6789012, '12345.6789'},
 			{123456789.123456, '123456789.1'},
 			{-123456789.123456, '-123456789.1'},
-			-- {0/0, '~^%-?nan$'},
+			{0/0, 'nan'},
 			{1/0, 'inf'},
 			{-1/0, '-inf'},
 
@@ -84,22 +88,26 @@ end', pointer_hex(luafn0))},
 			{luafn1, string.format('function (arg1)
   -- Lua function (%s)
   -- at spec/show_spec.moon:9
-end', pointer_hex(luafn1))},
+end', pointer_hex(luafn1)), -> lua_version > 51 or lua_jit},
 			{luafn2, string.format('function (arg1, arg2, ...)
   -- Lua function (%s)
   -- at spec/show_spec.moon:11
-end', pointer_hex(luafn2))},
+end', pointer_hex(luafn2)), -> lua_version > 51 or lua_jit},
 			{luafnvar, string.format('function (...)
   -- Lua function (%s)
   -- at spec/show_spec.moon:13
-end', pointer_hex(luafnvar))},
+end', pointer_hex(luafnvar)), -> lua_version > 51 or lua_jit},
 			{cfn, string.format('function (...)
   -- C function (%s)
-end', pointer_hex(cfn))},
+end', pointer_hex(cfn)), -> lua_version > 51 or lua_jit},
 		}
 		for _, case in ipairs (cases)
 			got = show(case[1])
 			want = case[2]
+			predicate = case[3]
+
+			if predicate
+				continue unless predicate()
 
 			-- pattern-match if the first char is ~
 			if string.sub(want, 1, 1) == '~'

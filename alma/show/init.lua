@@ -28,7 +28,12 @@ show_detect_circular = function(x, seen)
     if math_type(x) == 'integer' then
       return string.format('%d', x)
     else
-      return string.format('%.10g', x)
+      local s = string.format('%.10g', x)
+      if string.find(s, 'nan') then
+        return 'nan'
+      else
+        return s
+      end
     end
   elseif 'string' == _exp_0 then
     return string.format('%q', x)

@@ -22,7 +22,13 @@ show_detect_circular = (x, seen) ->
 			if math_type(x) == 'integer'
 				string.format('%d', x)
 			else
-				string.format('%.10g', x)
+				s = string.format('%.10g', x)
+
+				-- standardize the representation of NaN, some Lua versions return '-nan'
+				if string.find(s, 'nan')
+					'nan'
+				else
+					s
 
 		when 'string'
 			string.format('%q', x)

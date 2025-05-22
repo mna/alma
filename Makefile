@@ -4,10 +4,10 @@
 .PHONY: test testcov rock build lint clean
 
 test: build
-	busted --loaders moonscript ${BUSTED_ARGS}
+	busted ${BUSTED_ARGS}
 
 testcov: build
-	busted --loaders moonscript --coverage ${BUSTED_ARGS}
+	busted --run coverage ${BUSTED_ARGS}
 	xdg-open luacov_html/index.html
 
 rock: build

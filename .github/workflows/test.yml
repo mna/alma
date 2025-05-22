@@ -24,10 +24,10 @@ jobs:
         with:
           luarocksVersion: "3.11.1"
 
-      - name: Install dependencies
-        run: |
-          luarocks install busted
-          luarocks install inspect
+      # - name: Install dependencies
+      #   run: |
+      #     luarocks install busted
+      #     luarocks install inspect
 
       - name: Run tests
-        run: busted
+        run: luarocks test

@@ -1,7 +1,4 @@
 runreport = true
--- modules = {
--- 	["alma.compat"] = "alma/compat/init",
--- }
 exclude = {
 	"/lua_modules/",
 	"spec/.+",

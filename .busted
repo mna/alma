@@ -1,0 +1,8 @@
+return {
+	_all = {
+		loaders = 'moonscript',
+	},
+	coverage = {
+		coverage = true,
+	},
+}

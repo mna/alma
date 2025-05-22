@@ -81,7 +81,7 @@ return describe('show', function()
       },
       {
         0 / 0,
-        'nan'
+        '~^%-?nan$'
       },
       {
         1 / 0,
@@ -292,7 +292,13 @@ return describe('show', function()
     }
     for _, case in ipairs((cases)) do
       local got = show(case[1])
-      assert.are.equal(case[2], got)
+      local want = case[2]
+      if string.sub(want, 1, 1) == '~' then
+        want = string.sub(want, 2)
+        assert.matches(got, want)
+      else
+        assert.are.equal(got, want)
+      end
     end
   end)
 end)

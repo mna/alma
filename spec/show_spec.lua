@@ -335,7 +335,7 @@ return describe('show', function()
           want = string.sub(want, 2)
           assert.matches(want, got)
         else
-          assert.are.equal(got, want)
+          assert.are.equal(want, got)
         end
         _continue_0 = true
       until true

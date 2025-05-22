@@ -114,4 +114,4 @@ end', pointer_hex(cfn)), -> lua_version > 51 or lua_jit},
 				want = string.sub(want, 2)
 				assert.matches(want, got)
 			else
-				assert.are.equal(got, want)
+				assert.are.equal(want, got)

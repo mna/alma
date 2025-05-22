@@ -28,6 +28,8 @@ show_detect_circular = (x, seen) ->
 				if string.find(s, 'nan')
 					'nan'
 				else
+					-- standardize the exponent e+NNN to eNNN (remove '+')
+					s = string.gsub(s, 'e%+', 'e', 1)
 					s
 
 		when 'string'

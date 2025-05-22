@@ -32,6 +32,7 @@ show_detect_circular = function(x, seen)
       if string.find(s, 'nan') then
         return 'nan'
       else
+        s = string.gsub(s, 'e%+', 'e', 1)
         return s
       end
     end

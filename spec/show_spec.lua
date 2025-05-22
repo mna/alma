@@ -17,7 +17,7 @@ return describe('show', function()
     show = require('alma.show').show
     local maj, min = string.match(_G._VERSION, 'Lua (%d+)%.(%d+)')
     lua_version = tonumber(maj .. min)
-    lua_jit = (type(jit) == 'table')
+    lua_jit = (type(_G.jit) == 'table')
   end)
   return it('returns as expected', function()
     local thread = coroutine.create(function() end)
@@ -70,14 +70,14 @@ return describe('show', function()
         1.4569823e12,
         '1456982300000',
         function()
-          return lua_version < 54
+          return lua_version < 53
         end
       },
       {
         1.4569823e12,
         '1.4569823e12',
         function()
-          return lua_version >= 54
+          return lua_version >= 53
         end
       },
       {

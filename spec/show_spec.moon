@@ -16,7 +16,7 @@ describe 'show', ->
 		{:show} = require 'alma.show'
 		maj, min = string.match(_G._VERSION, 'Lua (%d+)%.(%d+)')
 		lua_version = tonumber(maj .. min) -- e.g. 54 for 5.4, 51 for 5.1 and JIT
-		lua_jit = (type(jit) == 'table')
+		lua_jit = (type(_G.jit) == 'table')
 
 	it 'returns as expected', ->
 		thread = coroutine.create(->)

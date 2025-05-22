@@ -1,6 +1,8 @@
 local assert = require('luassert')
 local inspect = require('inspect')
 local _ = inspect
+local pointer_hex
+pointer_hex = require('alma.compat').pointer_hex
 local luafn0
 luafn0 = function() end
 local luafn1
@@ -217,11 +219,11 @@ return describe('show', function()
       },
       {
         thread,
-        string.format('<thread %p>', thread)
+        string.format('<thread %s>', pointer_hex(thread))
       },
       {
         userdata,
-        string.format('<userdata %p>', userdata)
+        string.format('<userdata %s>', pointer_hex(userdata))
       },
       {
         {
@@ -273,23 +275,23 @@ return describe('show', function()
       },
       {
         luafn0,
-        string.format('function ()\n  -- Lua function (%p)\n  -- at spec/show_spec.moon:5\nend', luafn0)
+        string.format('function ()\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:7\nend', pointer_hex(luafn0))
       },
       {
         luafn1,
-        string.format('function (arg1)\n  -- Lua function (%p)\n  -- at spec/show_spec.moon:7\nend', luafn1)
+        string.format('function (arg1)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:9\nend', pointer_hex(luafn1))
       },
       {
         luafn2,
-        string.format('function (arg1, arg2, ...)\n  -- Lua function (%p)\n  -- at spec/show_spec.moon:9\nend', luafn2)
+        string.format('function (arg1, arg2, ...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:11\nend', pointer_hex(luafn2))
       },
       {
         luafnvar,
-        string.format('function (...)\n  -- Lua function (%p)\n  -- at spec/show_spec.moon:11\nend', luafnvar)
+        string.format('function (...)\n  -- Lua function (%s)\n  -- at spec/show_spec.moon:13\nend', pointer_hex(luafnvar))
       },
       {
         cfn,
-        string.format('function (...)\n  -- C function (%p)\nend', cfn)
+        string.format('function (...)\n  -- C function (%s)\nend', pointer_hex(cfn))
       }
     }
     for _, case in ipairs((cases)) do

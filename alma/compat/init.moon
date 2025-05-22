@@ -17,6 +17,14 @@ mtype = (n) ->
 	else
 		'float'
 
+-- Lua < 5.4 (and != LuaJIT) does not support the %p format in string.format,
+-- so this is a version-portable way to extract the address of a value using
+-- its string representation.
+pointer_hex = (v) ->
+	s = tostring(v)
+	hex = string.match(s, '0x%x+')
+	hex or ''
+
 {
 	-- Lua 5.1 has the global unpack function, and starting with Lua 5.2 it is
 	-- the table.unpack function.
@@ -30,4 +38,6 @@ mtype = (n) ->
 	-- (integer or float). This module provides a compatible version for previous
 	-- Lua versions.
 	math_type: math.type or mtype
+
+	:pointer_hex
 }

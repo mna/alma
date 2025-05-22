@@ -3,7 +3,7 @@ string = require 'string'
 table = require 'table'
 
 meta = require 'alma.meta'
-{:math_type} = require 'alma.compat'
+{:math_type, :pointer_hex} = require 'alma.compat'
 
 show_detect_circular = (x, seen) ->
 	if x == nil then return 'nil'
@@ -47,7 +47,7 @@ show_detect_circular = (x, seen) ->
 			for k, v in pairs(x)
 				if math_type(k) == 'integer' and k > 0 and k <= array_up_to
 					continue
-				table.insert(key_vals, string.format('[%s] = %s', 
+				table.insert(key_vals, string.format('[%s] = %s',
 					show_detect_circular(k, seen), show_detect_circular(v, seen)))
 
 			if #key_vals > 0
@@ -78,7 +78,7 @@ show_detect_circular = (x, seen) ->
 				table.insert(parts, '...')
 			table.insert(parts, ')\n')
 
-			table.insert(parts, string.format("  -- %s function (%p)\n", finfo.what, x))
+			table.insert(parts, string.format("  -- %s function (%s)\n", finfo.what, pointer_hex(x)))
 			if finfo.linedefined > 0
 				table.insert(parts, string.format('  -- at %s:%d\n', finfo.short_src, finfo.linedefined))
 			table.insert(parts, "end")
@@ -86,10 +86,10 @@ show_detect_circular = (x, seen) ->
 			table.concat(parts)
 
 		when 'thread'
-			"<thread #{string.format('%p', x)}>"
+			"<thread #{string.format('%s', pointer_hex(x))}>"
 
 		when 'userdata'
-			"<userdata #{string.format('%p', x)}>"
+			"<userdata #{string.format('%s', pointer_hex(x))}>"
 
 		else
 			"<unknown type: #{type(x)}>"

@@ -24,10 +24,9 @@ jobs:
         with:
           luarocksVersion: "3.11.1"
 
-      # - name: Install dependencies
-      #   run: |
-      #     luarocks install busted
-      #     luarocks install inspect
+      - name: Configure LUA_PATH
+        run: |
+          export LUA_PATH="${GITHUB_WORKSPACE}/alma/?.lua;${GITHUB_WORKSPACE}/alma/?/init.lua;$LUA_PATH"
 
       - name: Run tests
         run: luarocks test

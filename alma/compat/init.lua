@@ -24,8 +24,15 @@ mtype = function(n)
     return 'float'
   end
 end
+local pointer_hex
+pointer_hex = function(v)
+  local s = tostring(v)
+  local hex = string.match(s, '0x%x+')
+  return hex or ''
+end
 return {
   table_unpack = _G.unpack or table.unpack,
   table_pack = table.pack or pack,
-  math_type = math.type or mtype
+  math_type = math.type or mtype,
+  pointer_hex = pointer_hex
 }

@@ -2,6 +2,8 @@ assert = require 'luassert'
 inspect = require 'inspect'
 _ = inspect -- don't complain if unused
 
+{:pointer_hex} = require 'alma.compat'
+
 luafn0 = () -> -- do not move
 luafn1 = (a) -> -- do not move
 luafn2 = (a, b, ...) -> -- do not move
@@ -62,8 +64,8 @@ describe 'show', ->
 			{{'a', 'b', 'c', [0]: 'd'}, '{"a", "b", "c", [0] = "d"}'},
 			{{'a', 'b', 'c', [-1]: 'd'}, '{"a", "b", "c", [-1] = "d"}'},
 
-			{thread, string.format('<thread %p>', thread)},
-			{userdata, string.format('<userdata %p>', userdata)},
+			{thread, string.format('<thread %s>', pointer_hex(thread))},
+			{userdata, string.format('<userdata %s>', pointer_hex(userdata))},
 
 			{{'@@show': true}, '{["@@show"] = true}'},
 			{setmetatable({'a', x: 1}, {'@@show': -> '<custom>'}), '<custom>'},
@@ -76,24 +78,24 @@ describe 'show', ->
 			-- {setmetatable({'a', x: 1}, {'@@show': setmetatable({}, {__call: setmetatable({}, {__call: -> '<custom>'})})}), '<custom>'},
 
 			{luafn0, string.format('function ()
-  -- Lua function (%p)
-  -- at spec/show_spec.moon:5
-end', luafn0)},
-			{luafn1, string.format('function (arg1)
-  -- Lua function (%p)
+  -- Lua function (%s)
   -- at spec/show_spec.moon:7
-end', luafn1)},
-			{luafn2, string.format('function (arg1, arg2, ...)
-  -- Lua function (%p)
+end', pointer_hex(luafn0))},
+			{luafn1, string.format('function (arg1)
+  -- Lua function (%s)
   -- at spec/show_spec.moon:9
-end', luafn2)},
-			{luafnvar, string.format('function (...)
-  -- Lua function (%p)
+end', pointer_hex(luafn1))},
+			{luafn2, string.format('function (arg1, arg2, ...)
+  -- Lua function (%s)
   -- at spec/show_spec.moon:11
-end', luafnvar)},
+end', pointer_hex(luafn2))},
+			{luafnvar, string.format('function (...)
+  -- Lua function (%s)
+  -- at spec/show_spec.moon:13
+end', pointer_hex(luafnvar))},
 			{cfn, string.format('function (...)
-  -- C function (%p)
-end', cfn)},
+  -- C function (%s)
+end', pointer_hex(cfn))},
 		}
 		for _, case in ipairs (cases)
 			got = show(case[1])

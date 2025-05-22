@@ -2,8 +2,11 @@ local debug = require('debug')
 local string = require('string')
 local table = require('table')
 local meta = require('alma.meta')
-local math_type
-math_type = require('alma.compat').math_type
+local math_type, pointer_hex
+do
+  local _obj_0 = require('alma.compat')
+  math_type, pointer_hex = _obj_0.math_type, _obj_0.pointer_hex
+end
 local show_detect_circular
 show_detect_circular = function(x, seen)
   if x == nil then
@@ -86,16 +89,16 @@ show_detect_circular = function(x, seen)
       table.insert(parts, '...')
     end
     table.insert(parts, ')\n')
-    table.insert(parts, string.format("  -- %s function (%p)\n", finfo.what, x))
+    table.insert(parts, string.format("  -- %s function (%s)\n", finfo.what, pointer_hex(x)))
     if finfo.linedefined > 0 then
       table.insert(parts, string.format('  -- at %s:%d\n', finfo.short_src, finfo.linedefined))
     end
     table.insert(parts, "end")
     return table.concat(parts)
   elseif 'thread' == _exp_0 then
-    return "<thread " .. tostring(string.format('%p', x)) .. ">"
+    return "<thread " .. tostring(string.format('%s', pointer_hex(x))) .. ">"
   elseif 'userdata' == _exp_0 then
-    return "<userdata " .. tostring(string.format('%p', x)) .. ">"
+    return "<userdata " .. tostring(string.format('%s', pointer_hex(x))) .. ">"
   else
     return "<unknown type: " .. tostring(type(x)) .. ">"
   end

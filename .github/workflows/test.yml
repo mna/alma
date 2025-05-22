@@ -26,9 +26,7 @@ jobs:
 
       - name: Configure LUA_PATH
         run: |
-          export LUA_PATH="${GITHUB_WORKSPACE}/?.lua;${GITHUB_WORKSPACE}/?/init.lua;$LUA_PATH"
-          echo "$GITHUB_WORKSPACE"
-          echo "$LUA_PATH"
+          echo "LUA_PATH=${GITHUB_WORKSPACE}/?.lua;${GITHUB_WORKSPACE}/?/init.lua;$LUA_PATH" >> $GITHUB_ENV
 
       - name: Run tests
         run: luarocks test

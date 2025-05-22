@@ -287,7 +287,7 @@ return describe('show', function()
       },
       {
         cfn,
-        string.format('function (...)\n  -- C function (%s)\nend', pointer_hex(cfn))
+        string.format('function (...)\n  -- C function (%s)\nendz', pointer_hex(cfn))
       }
     }
     for _, case in ipairs((cases)) do
@@ -295,7 +295,7 @@ return describe('show', function()
       local want = case[2]
       if string.sub(want, 1, 1) == '~' then
         want = string.sub(want, 2)
-        assert.matches(got, want)
+        assert.matches(want, got)
       else
         assert.are.equal(got, want)
       end

@@ -6,6 +6,8 @@ Array__all = (a, p) ->
 
 TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
 
+TypeClass__factory = (name, dependencies, requirements) ->
+
 M = {}
 
 M.TypeClass = (name, url, dependencies, test) ->

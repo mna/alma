@@ -3,8 +3,7 @@
 -- Array helper functions.
 Array__all = (a, p) ->
 	for _, v in ipairs(a)
-		if not p(v)
-			return false
+		return false unless p(v)
 	true
 
 Array__filter = (a, p) ->
@@ -12,6 +11,10 @@ Array__filter = (a, p) ->
 	for _, v in ipairs(a)
 		table.insert(r, v) if p(v)
 	r
+
+Array__each = (a, f) ->
+	for _, v in ipairs(a)
+		f(v)
 
 -- Location data type = Constructor | Value
 Constructor = 'Constructor'
@@ -75,34 +78,76 @@ TypeClass__factory = (name, dependencies, requirements) ->
 	static_methods = Array__filter(requirements, (req) -> req.location == Constructor)
 	metatable_methods = Array__filter(requirements, (req) -> req.location == Value)
 
+	type_class_test = (seen) -> (x) ->
+		-- we use memoization because the test function can be called from within
+		-- itself when looking for instance methods (e.g. 'equals' on an Array
+		-- checks for each element in the array, and the same element could appear
+		-- multiple times). We use a table to keep track of seen values, we don't
+		-- need to worry about nil values being significant (nil is special-cased
+		-- in the instance methods lookup).
+		return true if seen[x]
+
+		seen[x] = true
+		ok, err_or_result = pcall(
+			->
+				Array__all(static_methods, (sm) ->
+					x != nil and
+					static_method(sm.name, sm.implementations, getmetatable(x)) != nil
+				) and
+				Array__all(metatable_methods, (mm) ->
+					has_metatable_method(mm.name, mm.implementations, x)
+				)
+		)
+
+		seen[x] = nil
+		error(err_or_result) unless ok
+		err_or_result
+
 	type_class = M.TypeClass("alma.type-classes/#{name}",
 		"https://github.com/mna/alma/tree/v#{version}/alma/type-classes##{name}",
 		dependencies,
-		(
-			(seen) ->
-				(x) ->
-					-- we use memoization because the test function can be called from within
-					-- itself when looking for instance methods (e.g. 'equals' on an Array
-					-- checks for each element in the array, and the same element could appear
-					-- multiple times). We use a table to keep track of seen values, we don't
-					-- need to worry about nil values being significant (nil is special-cased
-					-- in the instance methods lookup).
-					if seen[x] then return true
-					seen[x] = true
-					ok, err_or_result = pcall(->
-						Array__all(static_methods, (sm) ->
-							x != nil and
-							static_method(sm.name, sm.implementations, getmetatable(x)) != nil
-						) and
-						Array__all(metatable_methods, (mm) ->
-							has_metatable_method(mm.name, mm.implementations, x)
-						)
-					)
-
-					seen[x] = nil
-					error(err_or_result) unless ok
-					err_or_result
-		)({})
+		type_class_test({})
 	)
+
+	type_class.methods = {}
+
+	Array__each(static_methods, (sm) ->
+		{:arity, :implementations, :name} = sm
+		type_class.methods[name] = switch arity
+			when 0
+				(type_rep) -> (static_method(name, implementations, type_rep)())
+			when 1
+				(type_rep, a) -> (static_method(name, implementations, type_rep)(a))
+			else
+				(type_rep, a, b) -> (static_method(name, implementations, type_rep)(a, b))
+	)
+
+	Array__each(metatable_methods, (mm) ->
+		{:arity, :implementations, :name} = mm
+		type_class.methods[name] = switch arity
+			when 0
+				nil
+			when 1
+				nil
+			else
+				nil
+	)
+
+	-- prototypeMethods.forEach (({name, arity, implementations}) => {
+	--   typeClass.methods[name] = (
+	--     arity === 0 ? context => (
+	--       (prototypeMethod (name, implementations, context)).call (context)
+	--     ) :
+	--     arity === 1 ? (a, context) => (
+	--       (prototypeMethod (name, implementations, context)).call (context, a)
+	--     ) :
+	--     (a, b, context) => (
+	--       (prototypeMethod (name, implementations, context))
+	--       .call (context, a, b)
+	--     )
+	--   );
+	-- });
+	--
+	-- return typeClass;
 
 M

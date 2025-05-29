@@ -3,7 +3,7 @@ is_callable = require('alma.meta').is_callable
 local Array__all
 Array__all = function(a, p)
   for _, v in ipairs(a) do
-    if not p(v) then
+    if not (p(v)) then
       return false
     end
   end
@@ -18,6 +18,12 @@ Array__filter = function(a, p)
     end
   end
   return r
+end
+local Array__each
+Array__each = function(a, f)
+  for _, v in ipairs(a) do
+    f(v)
+  end
 end
 local Constructor = 'Constructor'
 local Value = 'Value'
@@ -55,7 +61,7 @@ static_method = function(name, implementations, type_rep)
     return implementations.Function
   end
   local prefixed_name = 'fantasy-land/' .. name
-  if meta.is_callable(type_rep[prefixed_name]) then
+  if is_callable(type_rep[prefixed_name]) then
     return type_rep[prefixed_name]
   end
 end
@@ -91,7 +97,8 @@ TypeClass__factory = function(name, dependencies, requirements)
   local metatable_methods = Array__filter(requirements, function(req)
     return req.location == Value
   end)
-  local type_class = M.TypeClass("alma.type-classes/" .. tostring(name), "https://github.com/mna/alma/tree/v" .. tostring(version) .. "/alma/type-classes#" .. tostring(name), dependencies, (function(seen)
+  local type_class_test
+  type_class_test = function(seen)
     return function(x)
       if seen[x] then
         return true
@@ -110,6 +117,38 @@ TypeClass__factory = function(name, dependencies, requirements)
       end
       return err_or_result
     end
-  end)({ }))
+  end
+  local type_class = M.TypeClass("alma.type-classes/" .. tostring(name), "https://github.com/mna/alma/tree/v" .. tostring(version) .. "/alma/type-classes#" .. tostring(name), dependencies, type_class_test({ }))
+  type_class.methods = { }
+  Array__each(static_methods, function(sm)
+    local arity, implementations
+    arity, implementations, name = sm.arity, sm.implementations, sm.name
+    local _exp_0 = arity
+    if 0 == _exp_0 then
+      type_class.methods[name] = function(type_rep)
+        return (static_method(name, implementations, type_rep)())
+      end
+    elseif 1 == _exp_0 then
+      type_class.methods[name] = function(type_rep, a)
+        return (static_method(name, implementations, type_rep)(a))
+      end
+    else
+      type_class.methods[name] = function(type_rep, a, b)
+        return (static_method(name, implementations, type_rep)(a, b))
+      end
+    end
+  end)
+  return Array__each(metatable_methods, function(mm)
+    local arity, implementations
+    arity, implementations, name = mm.arity, mm.implementations, mm.name
+    local _exp_0 = arity
+    if 0 == _exp_0 then
+      type_class.methods[name] = nil
+    elseif 1 == _exp_0 then
+      type_class.methods[name] = nil
+    else
+      type_class.methods[name] = nil
+    end
+  end)
 end
 return M

@@ -44,7 +44,7 @@ static_method = (name, implementations, type_rep) ->
 			return implementations.Function
 
 	prefixed_name = 'fantasy-land/' .. name
-	if meta.is_callable(type_rep[prefixed_name])
+	if is_callable(type_rep[prefixed_name])
 		return type_rep[prefixed_name]
 
 -- Exported module
@@ -82,9 +82,9 @@ TypeClass__factory = (name, dependencies, requirements) ->
 			(seen) ->
 				(x) ->
 					-- we use memoization because the test function can be called from within
-					-- itself when looking for instance methods (e.g. 'equals' on an Array 
+					-- itself when looking for instance methods (e.g. 'equals' on an Array
 					-- checks for each element in the array, and the same element could appear
-					-- multiple times). We use a table to keep track of seen values, we don't 
+					-- multiple times). We use a table to keep track of seen values, we don't
 					-- need to worry about nil values being significant (nil is special-cased
 					-- in the instance methods lookup).
 					if seen[x] then return true

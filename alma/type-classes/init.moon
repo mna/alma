@@ -33,7 +33,7 @@ FunctionType = {name: 'Function'}
 -- is either the metatable of the value, or a alma.type-classes type
 -- representative for one of the built-in types.
 static_method = (name, implementations, type_rep) ->
-	switch type_rep 
+	switch type_rep
 		when ArrayType
 			return implementations.Array
 		when StrMapType
@@ -43,9 +43,9 @@ static_method = (name, implementations, type_rep) ->
 		when FunctionType
 			return implementations.Function
 
-    prefixed_name = 'fantasy-land/' .. name
-    if meta.is_callable(type_rep[prefixed_name])
-      return type_rep[prefixed_name]
+	prefixed_name = 'fantasy-land/' .. name
+	if meta.is_callable(type_rep[prefixed_name])
+		return type_rep[prefixed_name]
 
 -- Exported module
 M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
@@ -78,6 +78,31 @@ TypeClass__factory = (name, dependencies, requirements) ->
 	type_class = M.TypeClass("alma.type-classes/#{name}",
 		"https://github.com/mna/alma/tree/v#{version}/alma/type-classes##{name}",
 		dependencies,
-		->)
+		(
+			(seen) ->
+				(x) ->
+					-- we use memoization because the test function can be called from within
+					-- itself when looking for instance methods (e.g. 'equals' on an Array 
+					-- checks for each element in the array, and the same element could appear
+					-- multiple times). We use a table to keep track of seen values, we don't 
+					-- need to worry about nil values being significant (nil is special-cased
+					-- in the instance methods lookup).
+					if seen[x] then return true
+					seen[x] = true
+					ok, err_or_result = pcall(->
+						Array__all(static_methods, (sm) ->
+							x != nil and
+							static_method(sm.name, sm.implementations, getmetatable(x)) != nil
+						) and
+						Array__all(metatable_methods, (mm) ->
+							has_metatable_method(mm.name, mm.implementations, x)
+						)
+					)
+
+					seen[x] = nil
+					error(err_or_result) unless ok
+					err_or_result
+		)({})
+	)
 
 M

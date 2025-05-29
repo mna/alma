@@ -91,6 +91,25 @@ TypeClass__factory = function(name, dependencies, requirements)
   local metatable_methods = Array__filter(requirements, function(req)
     return req.location == Value
   end)
-  local type_class = M.TypeClass("alma.type-classes/" .. tostring(name), "https://github.com/mna/alma/tree/v" .. tostring(version) .. "/alma/type-classes#" .. tostring(name), dependencies, function() end)
+  local type_class = M.TypeClass("alma.type-classes/" .. tostring(name), "https://github.com/mna/alma/tree/v" .. tostring(version) .. "/alma/type-classes#" .. tostring(name), dependencies, (function(seen)
+    return function(x)
+      if seen[x] then
+        return true
+      end
+      seen[x] = true
+      local ok, err_or_result = pcall(function()
+        return Array__all(static_methods, function(sm)
+          return x ~= nil and static_method(sm.name, sm.implementations, getmetatable(x)) ~= nil
+        end) and Array__all(metatable_methods, function(mm)
+          return has_metatable_method(mm.name, mm.implementations, x)
+        end)
+      end)
+      seen[x] = nil
+      if not (ok) then
+        error(err_or_result)
+      end
+      return err_or_result
+    end
+  end)({ }))
 end
 return M

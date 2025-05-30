@@ -1,5 +1,8 @@
-local is_callable
-is_callable = require('alma.meta').is_callable
+local is_callable, get_metavalue
+do
+  local _obj_0 = require('alma.meta')
+  is_callable, get_metavalue = _obj_0.is_callable, _obj_0.get_metavalue
+end
 local Array__all
 Array__all = function(a, p)
   for _, v in ipairs(a) do
@@ -48,6 +51,12 @@ local StringType = {
 local FunctionType = {
   name = 'Function'
 }
+local M = {
+  ArrayType = ArrayType,
+  StrMapType = StrMapType,
+  StringType = StringType,
+  FunctionType = FunctionType
+}
 local static_method
 static_method = function(name, implementations, type_rep)
   local _exp_0 = type_rep
@@ -65,12 +74,47 @@ static_method = function(name, implementations, type_rep)
     return type_rep[prefixed_name]
   end
 end
-local M = {
-  ArrayType = ArrayType,
-  StrMapType = StrMapType,
-  StringType = StringType,
-  FunctionType = FunctionType
-}
+local builtin_metatable_method
+builtin_metatable_method = function(implementations, value)
+  local _exp_0 = type(value)
+  if 'nil' == _exp_0 then
+    return implementations.Nil
+  elseif 'number' == _exp_0 then
+    return implementations.Number
+  elseif 'string' == _exp_0 then
+    return implementations.String
+  elseif 'boolean' == _exp_0 then
+    return implementations.Boolean
+  elseif 'function' == _exp_0 then
+    return implementations.Function
+  elseif 'table' == _exp_0 then
+    local _exp_1 = getmetatable(value)
+    if Array__metatable == _exp_1 then
+      return implementations.Array
+    elseif StrMap__metatable == _exp_1 then
+      return implementations.StrMap
+    else
+      return nil
+    end
+  end
+end
+local has_metatable_method
+has_metatable_method = function(name, implementations, value)
+  if value == nil then
+    return implementations.Nil
+  end
+  local prefixed_name = 'fantasy-land/' .. name
+  if get_metavalue(value, prefixed_name, is_callable) then
+    return true
+  end
+  local _exp_0 = name
+  if 'equals' == _exp_0 then
+    local _ = nil
+  elseif 'lte' == _exp_0 then
+    local _ = nil
+  end
+  return builtin_metatable_method(implementations, value) ~= nil
+end
 M.TypeClass = function(name, url, dependencies, test)
   return setmetatable({
     name = name,

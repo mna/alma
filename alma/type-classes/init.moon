@@ -1,4 +1,4 @@
-{:is_callable} = require 'alma.meta'
+{:is_callable, :get_metavalue} = require 'alma.meta'
 
 -- Array helper functions.
 Array__all = (a, p) ->
@@ -30,6 +30,9 @@ StrMapType = {name: 'StrMap'}
 StringType = {name: 'String'}
 FunctionType = {name: 'Function'}
 
+-- Exported module
+M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
+
 -- finds the proper implementation of a static method for a given type
 -- representative; name must be the (unprefixed) name of the fantasy land
 -- method, implementations the list of available implementations, and type_rep
@@ -50,8 +53,80 @@ static_method = (name, implementations, type_rep) ->
 	if is_callable(type_rep[prefixed_name])
 		return type_rep[prefixed_name]
 
--- Exported module
-M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
+builtin_metatable_method = (implementations, value) ->
+	switch type(value)
+		when 'nil'
+			return implementations.Nil
+		when 'number'
+			return implementations.Number
+		when 'string'
+			return implementations.String
+		when 'boolean'
+			return implementations.Boolean
+		when 'function'
+			return implementations.Function
+		when 'table'
+			switch getmetatable(value)
+				when Array__metatable then return implementations.Array
+				when StrMap__metatable then return implementations.StrMap
+				else
+					-- TODO: if empty or # > 0, default to array
+					nil
+
+has_metatable_method = (name, implementations, value) ->
+	return implementations.Nil if value == nil
+
+	prefixed_name = 'fantasy-land/' .. name
+	return true if get_metavalue(value, prefixed_name, is_callable)
+
+	switch name
+		when 'equals'
+			-- each element in array or object must be a Setoid
+			nil
+		when 'lte'
+			-- each element in array or object must be an Ord
+			nil
+
+	builtin_metatable_method(implementations, value) != nil
+ 
+  -- const hasPrototypeMethod = (name, implementations, value) => {
+  --   switch (value) {
+  --     case null: return implementations.Null != null;
+  --     case undefined: return implementations.Undefined != null;
+  --   }
+  --
+  --   const prefixedName = 'fantasy-land/' + name;
+  --   const isPrototype = value.constructor == null ||
+  --                       value.constructor.prototype !== value;
+  --   if (isPrototype && typeof value[prefixedName] === 'function') {
+  --     return true;
+  --   }
+  --
+  --   if (typeof value['@@type'] === 'string') return false;
+  --
+  --   if (name === 'equals') {
+  --     if (value.constructor === Array || type (value) === 'Array') {
+  --       return value.every (Z.Setoid.test);
+  --     }
+  --
+  --     if (value.constructor === Object || type (value) === 'Object') {
+  --       return (Object.values (value)).every (Z.Setoid.test);
+  --     }
+  --   }
+  --
+  --   if (name === 'lte') {
+  --     if (value.constructor === Array || type (value) === 'Array') {
+  --       return value.every (Z.Ord.test);
+  --     }
+  --
+  --     if (value.constructor === Object || type (value) === 'Object') {
+  --       return (Object.values (value)).every (Z.Ord.test);
+  --     }
+  --   }
+  --
+  --   return customPrototypeMethod (implementations, value) != null;
+  -- };
+  --
 
 M.TypeClass = (name, url, dependencies, test) ->
 	setmetatable({

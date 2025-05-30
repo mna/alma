@@ -1,5 +1,10 @@
 {:is_callable, :get_metavalue} = require 'alma.meta'
 
+-- Type metatables
+TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
+Array__metatable = {'@@type': 'alma.type-classes/Array@1'}
+StrMap__metatable = {'@@type': 'alma.type-classes/StrMap@1'}
+
 -- Array helper functions.
 Array__all = (a, p) ->
 	for _, v in ipairs(a)
@@ -16,14 +21,28 @@ Array__each = (a, f) ->
 	for _, v in ipairs(a)
 		f(v)
 
+is_table_array = (t) ->
+	switch getmetatable(t)
+		when Array__metatable
+			-- explicitly an array
+			true
+		when StrMap__metatable
+			-- explicitly a StrMap object
+			false
+		else
+			-- empty table or non-empty array part is considered array
+			(#t > 0) or (next(t) == nil)
+
+
+-- StrMap helper functions.
+StrMap__all_values = (o, p) ->
+	for _, v in pairs(o)
+		return false unless p(v)
+	true
+
 -- Location data type = Constructor | Value
 Constructor = 'Constructor'
 Value = 'Value'
-
--- Type metatables
-TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
-Array__metatable = {'@@type': 'alma.type-classes/Array@1'}
-StrMap__metatable = {'@@type': 'alma.type-classes/StrMap@1'}
 
 ArrayType = {name: 'Array'}
 StrMapType = {name: 'StrMap'}
@@ -56,22 +75,20 @@ static_method = (name, implementations, type_rep) ->
 builtin_metatable_method = (implementations, value) ->
 	switch type(value)
 		when 'nil'
-			return implementations.Nil
+			implementations.Nil
 		when 'number'
-			return implementations.Number
+			implementations.Number
 		when 'string'
-			return implementations.String
+			implementations.String
 		when 'boolean'
-			return implementations.Boolean
+			implementations.Boolean
 		when 'function'
-			return implementations.Function
+			implementations.Function
 		when 'table'
-			switch getmetatable(value)
-				when Array__metatable then return implementations.Array
-				when StrMap__metatable then return implementations.StrMap
-				else
-					-- TODO: if empty or # > 0, default to array
-					nil
+			if is_table_array(value)
+				implementations.Array
+			else
+				implementations.StrMap
 
 has_metatable_method = (name, implementations, value) ->
 	return implementations.Nil if value == nil
@@ -82,51 +99,20 @@ has_metatable_method = (name, implementations, value) ->
 	switch name
 		when 'equals'
 			-- each element in array or object must be a Setoid
-			nil
+			if type(value) == 'table'
+				if is_table_array(value)
+					return Array__all(value, M.Setoid.test)
+				else
+					return StrMap__all_values(value, M.Setoid.test)
 		when 'lte'
 			-- each element in array or object must be an Ord
-			nil
+			if type(value) == 'table'
+				if is_table_array(value)
+					return Array__all(value, M.Ord.test)
+				else
+					return StrMap__all_values(value, M.Ord.test)
 
 	builtin_metatable_method(implementations, value) != nil
- 
-  -- const hasPrototypeMethod = (name, implementations, value) => {
-  --   switch (value) {
-  --     case null: return implementations.Null != null;
-  --     case undefined: return implementations.Undefined != null;
-  --   }
-  --
-  --   const prefixedName = 'fantasy-land/' + name;
-  --   const isPrototype = value.constructor == null ||
-  --                       value.constructor.prototype !== value;
-  --   if (isPrototype && typeof value[prefixedName] === 'function') {
-  --     return true;
-  --   }
-  --
-  --   if (typeof value['@@type'] === 'string') return false;
-  --
-  --   if (name === 'equals') {
-  --     if (value.constructor === Array || type (value) === 'Array') {
-  --       return value.every (Z.Setoid.test);
-  --     }
-  --
-  --     if (value.constructor === Object || type (value) === 'Object') {
-  --       return (Object.values (value)).every (Z.Setoid.test);
-  --     }
-  --   }
-  --
-  --   if (name === 'lte') {
-  --     if (value.constructor === Array || type (value) === 'Array') {
-  --       return value.every (Z.Ord.test);
-  --     }
-  --
-  --     if (value.constructor === Object || type (value) === 'Object') {
-  --       return (Object.values (value)).every (Z.Ord.test);
-  --     }
-  --   }
-  --
-  --   return customPrototypeMethod (implementations, value) != null;
-  -- };
-  --
 
 M.TypeClass = (name, url, dependencies, test) ->
 	setmetatable({

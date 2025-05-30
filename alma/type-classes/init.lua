@@ -3,6 +3,15 @@ do
   local _obj_0 = require('alma.meta')
   is_callable, get_metavalue = _obj_0.is_callable, _obj_0.get_metavalue
 end
+local TypeClass__metatable = {
+  ['@@type'] = 'alma.type-classes/TypeClass@1'
+}
+local Array__metatable = {
+  ['@@type'] = 'alma.type-classes/Array@1'
+}
+local StrMap__metatable = {
+  ['@@type'] = 'alma.type-classes/StrMap@1'
+}
 local Array__all
 Array__all = function(a, p)
   for _, v in ipairs(a) do
@@ -28,17 +37,28 @@ Array__each = function(a, f)
     f(v)
   end
 end
+local is_table_array
+is_table_array = function(t)
+  local _exp_0 = getmetatable(t)
+  if Array__metatable == _exp_0 then
+    return true
+  elseif StrMap__metatable == _exp_0 then
+    return false
+  else
+    return (#t > 0) or (next(t) == nil)
+  end
+end
+local StrMap__all_values
+StrMap__all_values = function(o, p)
+  for _, v in pairs(o) do
+    if not (p(v)) then
+      return false
+    end
+  end
+  return true
+end
 local Constructor = 'Constructor'
 local Value = 'Value'
-local TypeClass__metatable = {
-  ['@@type'] = 'alma.type-classes/TypeClass@1'
-}
-local Array__metatable = {
-  ['@@type'] = 'alma.type-classes/Array@1'
-}
-local StrMap__metatable = {
-  ['@@type'] = 'alma.type-classes/StrMap@1'
-}
 local ArrayType = {
   name = 'Array'
 }
@@ -88,13 +108,10 @@ builtin_metatable_method = function(implementations, value)
   elseif 'function' == _exp_0 then
     return implementations.Function
   elseif 'table' == _exp_0 then
-    local _exp_1 = getmetatable(value)
-    if Array__metatable == _exp_1 then
+    if is_table_array(value) then
       return implementations.Array
-    elseif StrMap__metatable == _exp_1 then
-      return implementations.StrMap
     else
-      return nil
+      return implementations.StrMap
     end
   end
 end
@@ -109,9 +126,21 @@ has_metatable_method = function(name, implementations, value)
   end
   local _exp_0 = name
   if 'equals' == _exp_0 then
-    local _ = nil
+    if type(value) == 'table' then
+      if is_table_array(value) then
+        return Array__all(value, M.Setoid.test)
+      else
+        return StrMap__all_values(value, M.Setoid.test)
+      end
+    end
   elseif 'lte' == _exp_0 then
-    local _ = nil
+    if type(value) == 'table' then
+      if is_table_array(value) then
+        return Array__all(value, M.Ord.test)
+      else
+        return StrMap__all_values(value, M.Ord.test)
+      end
+    end
   end
   return builtin_metatable_method(implementations, value) ~= nil
 end

@@ -28,6 +28,7 @@ build = {
 		["alma.meta"] = "alma/meta/init.lua",
 		["alma.show"] = "alma/show/init.lua",
 		["alma.type-classes"] = "alma/type-classes/init.lua",
+		["alma.type-classes.Function"] = "alma/type-classes/Function.lua",
 		["alma.type-identifiers"] = "alma/type-identifiers/init.lua",
 	}
 }

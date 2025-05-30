@@ -3,6 +3,7 @@ do
   local _obj_0 = require('alma.meta')
   is_callable, get_metavalue = _obj_0.is_callable, _obj_0.get_metavalue
 end
+local Function = require('alma.type-classes.Function')
 local TypeClass__metatable = {
   ['@@type'] = 'alma.type-classes/TypeClass@1'
 }
@@ -243,4 +244,16 @@ TypeClass__factory = function(name, dependencies, requirements)
   end)
   return type_class
 end
+M.Category = TypeClass__factory('Category', {
+  M.Semigroupoid
+}, {
+  {
+    name = 'id',
+    location = Constructor,
+    arity = 0,
+    implementations = {
+      Function = Function.id
+    }
+  }
+})
 return M

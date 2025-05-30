@@ -1,4 +1,5 @@
 {:is_callable, :get_metavalue} = require 'alma.meta'
+Function = require 'alma.type-classes.Function'
 
 -- Type metatables
 TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
@@ -204,5 +205,20 @@ TypeClass__factory = (name, dependencies, requirements) ->
 	)
 
 	type_class
+
+-- ---------------------------
+-- Fantasy Land type classes
+-- ---------------------------
+
+M.Category = TypeClass__factory('Category', {M.Semigroupoid}, {
+	{
+		name: 'id',
+		location: Constructor,
+		arity: 0,
+		implementations: {
+			Function: Function.id,
+		},
+	},
+})
 
 M

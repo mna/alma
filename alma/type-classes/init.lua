@@ -118,7 +118,7 @@ end
 local has_metatable_method
 has_metatable_method = function(name, implementations, value)
   if value == nil then
-    return implementations.Nil
+    return (implementations.Nil ~= nil)
   end
   local prefixed_name = 'fantasy-land/' .. name
   if get_metavalue(value, prefixed_name, is_callable) then
@@ -143,6 +143,18 @@ has_metatable_method = function(name, implementations, value)
     end
   end
   return builtin_metatable_method(implementations, value) ~= nil
+end
+local metatable_method
+metatable_method = function(name, implementations, value)
+  if value == nil then
+    return implementations.Nil
+  end
+  local prefixed_name = 'fantasy-land/' .. name
+  local impl = get_metavalue(value, prefixed_name, is_callable)
+  if impl ~= nil then
+    return impl
+  end
+  return builtin_metatable_method(implementations, value)
 end
 M.TypeClass = function(name, url, dependencies, test)
   return setmetatable({
@@ -211,17 +223,24 @@ TypeClass__factory = function(name, dependencies, requirements)
       end
     end
   end)
-  return Array__each(metatable_methods, function(mm)
+  Array__each(metatable_methods, function(mm)
     local arity, implementations
     arity, implementations, name = mm.arity, mm.implementations, mm.name
     local _exp_0 = arity
     if 0 == _exp_0 then
-      type_class.methods[name] = nil
+      type_class.methods[name] = function(context)
+        return (metatable_method(name, implementations, context)(context))
+      end
     elseif 1 == _exp_0 then
-      type_class.methods[name] = nil
+      type_class.methods[name] = function(a, context)
+        return (metatable_method(name, implementations, context)(context, a))
+      end
     else
-      type_class.methods[name] = nil
+      type_class.methods[name] = function(a, b, context)
+        return (metatable_method(name, implementations, context)(context, a, b))
+      end
     end
   end)
+  return type_class
 end
 return M

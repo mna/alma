@@ -91,7 +91,7 @@ builtin_metatable_method = (implementations, value) ->
 				implementations.StrMap
 
 has_metatable_method = (name, implementations, value) ->
-	return implementations.Nil if value == nil
+	return (implementations.Nil != nil) if value == nil
 
 	prefixed_name = 'fantasy-land/' .. name
 	return true if get_metavalue(value, prefixed_name, is_callable)
@@ -113,6 +113,15 @@ has_metatable_method = (name, implementations, value) ->
 					return StrMap__all_values(value, M.Ord.test)
 
 	builtin_metatable_method(implementations, value) != nil
+
+metatable_method = (name, implementations, value) ->
+	return implementations.Nil if value == nil
+
+	prefixed_name = 'fantasy-land/' .. name
+	impl = get_metavalue(value, prefixed_name, is_callable)
+	return impl if impl != nil
+
+	builtin_metatable_method(implementations, value)
 
 M.TypeClass = (name, url, dependencies, test) ->
 	setmetatable({
@@ -187,28 +196,13 @@ TypeClass__factory = (name, dependencies, requirements) ->
 		{:arity, :implementations, :name} = mm
 		type_class.methods[name] = switch arity
 			when 0
-				nil
+				(context) -> (metatable_method(name, implementations, context)(context))
 			when 1
-				nil
+				(a, context) -> (metatable_method(name, implementations, context)(context, a))
 			else
-				nil
+				(a, b, context) -> (metatable_method(name, implementations, context)(context, a, b))
 	)
 
-	-- prototypeMethods.forEach (({name, arity, implementations}) => {
-	--   typeClass.methods[name] = (
-	--     arity === 0 ? context => (
-	--       (prototypeMethod (name, implementations, context)).call (context)
-	--     ) :
-	--     arity === 1 ? (a, context) => (
-	--       (prototypeMethod (name, implementations, context)).call (context, a)
-	--     ) :
-	--     (a, b, context) => (
-	--       (prototypeMethod (name, implementations, context))
-	--       .call (context, a, b)
-	--     )
-	--   );
-	-- });
-	--
-	-- return typeClass;
+	type_class
 
 M

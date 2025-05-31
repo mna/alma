@@ -174,6 +174,11 @@ end
 M.StrMap = function(o)
   return setmetatable(o or { }, StrMap__metatable)
 end
+M.Callable = function(c)
+  return function(...)
+    return c(...)
+  end
+end
 local TypeClass__factory
 TypeClass__factory = function(name, dependencies, requirements)
   local version = '0.1.0'
@@ -189,7 +194,9 @@ TypeClass__factory = function(name, dependencies, requirements)
       if seen[x] then
         return true
       end
-      seen[x] = true
+      if not (x == nil) then
+        seen[x] = true
+      end
       local ok, err_or_result = pcall(function()
         return Array__all(static_methods, function(sm)
           return x ~= nil and static_method(sm.name, sm.implementations, getmetatable(x)) ~= nil
@@ -197,7 +204,9 @@ TypeClass__factory = function(name, dependencies, requirements)
           return has_metatable_method(mm.name, mm.implementations, x)
         end)
       end)
-      seen[x] = nil
+      if not (x == nil) then
+        seen[x] = nil
+      end
       if not (ok) then
         error(err_or_result)
       end
@@ -244,6 +253,16 @@ TypeClass__factory = function(name, dependencies, requirements)
   end)
   return type_class
 end
+M.Semigroupoid = TypeClass__factory('Semigroupoid', { }, {
+  {
+    name = 'compose',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Function = Function.compose
+    }
+  }
+})
 M.Category = TypeClass__factory('Category', {
   M.Semigroupoid
 }, {

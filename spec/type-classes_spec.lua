@@ -1,7 +1,8 @@
 local assert = require('luassert')
 local inspect = require('inspect')
 local _ = inspect
-return describe('TypeClass', function()
+local math = require('math')
+describe('TypeClass', function()
   local TypeClass, identifier_of
   setup(function()
     TypeClass = require('alma.type-classes').TypeClass
@@ -58,5 +59,169 @@ return describe('TypeClass', function()
       foo = function() end,
       bar = 'not a func'
     }))
+  end)
+end)
+describe('Semigroupoid', function()
+  local Semigroupoid, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Semigroupoid, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Semigroupoid, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Semigroupoid))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Semigroupoid', Semigroupoid.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Semigroupoid", Semigroupoid.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = false,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = false,
+        value = ''
+      },
+      {
+        want = false,
+        value = 0
+      },
+      {
+        want = false,
+        value = true
+      },
+      {
+        want = false,
+        value = { }
+      },
+      {
+        want = false,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = false,
+        value = Array()
+      },
+      {
+        want = false,
+        value = StrMap()
+      },
+      {
+        want = true,
+        value = math.abs
+      },
+      {
+        want = false,
+        value = callable
+      },
+      {
+        want = true,
+        value = Callable(callable)
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Semigroupoid.test(c.value)
+      assert.are.equal(c.want, got)
+    end
+  end)
+end)
+return describe('Category', function()
+  local Category, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Category, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Category, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Category))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Category', Category.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Category", Category.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = false,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = false,
+        value = ''
+      },
+      {
+        want = false,
+        value = 0
+      },
+      {
+        want = false,
+        value = true
+      },
+      {
+        want = false,
+        value = { }
+      },
+      {
+        want = false,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = false,
+        value = Array()
+      },
+      {
+        want = false,
+        value = StrMap()
+      },
+      {
+        want = false,
+        value = callable
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Category.test(c.value)
+      assert.are.equal(c.want, got)
+    end
   end)
 end)

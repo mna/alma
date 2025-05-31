@@ -105,6 +105,7 @@ has_metatable_method = (name, implementations, value) ->
 					return Array__all(value, M.Setoid.test)
 				else
 					return StrMap__all_values(value, M.Setoid.test)
+
 		when 'lte'
 			-- each element in array or object must be an Ord
 			if type(value) == 'table'
@@ -141,6 +142,13 @@ M.Array = (a) ->
 M.StrMap = (o) ->
 	setmetatable(o or {}, StrMap__metatable)
 
+-- Callable Lua values do not satisfy the built-in Function type when testing
+-- for type classes because it would be ambiguous - should a table with a 
+-- __call metamethod be considered a Function or an array? So we provide a
+-- helper function to create a Function from a callable (it simply wraps the
+-- callable function call in a function).
+M.Callable = (c) -> (...) -> c(...)
+
 -- TypeClass__factory is used internally by this module to define type classes
 -- with similar boilerplate.
 TypeClass__factory = (name, dependencies, requirements) ->
@@ -158,7 +166,7 @@ TypeClass__factory = (name, dependencies, requirements) ->
 		-- in the instance methods lookup).
 		return true if seen[x]
 
-		seen[x] = true
+		seen[x] = true unless x == nil
 		ok, err_or_result = pcall(
 			->
 				Array__all(static_methods, (sm) ->
@@ -170,7 +178,7 @@ TypeClass__factory = (name, dependencies, requirements) ->
 				)
 		)
 
-		seen[x] = nil
+		seen[x] = nil unless x == nil
 		error(err_or_result) unless ok
 		err_or_result
 
@@ -209,6 +217,17 @@ TypeClass__factory = (name, dependencies, requirements) ->
 -- ---------------------------
 -- Fantasy Land type classes
 -- ---------------------------
+
+M.Semigroupoid = TypeClass__factory('Semigroupoid', {}, {
+	{
+		name: 'compose',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Function: Function.compose,
+		},
+	},
+})
 
 M.Category = TypeClass__factory('Category', {M.Semigroupoid}, {
 	{

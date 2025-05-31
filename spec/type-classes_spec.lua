@@ -215,8 +215,16 @@ return describe('Category', function()
         value = StrMap()
       },
       {
+        want = true,
+        value = math.abs
+      },
+      {
         want = false,
         value = callable
+      },
+      {
+        want = true,
+        value = Callable(callable)
       }
     }
     for _, c in ipairs(cases) do

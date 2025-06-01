@@ -3,45 +3,18 @@ do
   local _obj_0 = require('alma.meta')
   is_callable, get_metavalue = _obj_0.is_callable, _obj_0.get_metavalue
 end
+local Array = require('alma.type-classes.Array')
 local Function = require('alma.type-classes.Function')
 local TypeClass__metatable = {
   ['@@type'] = 'alma.type-classes/TypeClass@1'
 }
-local Array__metatable = {
-  ['@@type'] = 'alma.type-classes/Array@1'
-}
 local StrMap__metatable = {
   ['@@type'] = 'alma.type-classes/StrMap@1'
 }
-local Array__all
-Array__all = function(a, p)
-  for _, v in ipairs(a) do
-    if not (p(v)) then
-      return false
-    end
-  end
-  return true
-end
-local Array__filter
-Array__filter = function(a, p)
-  local r = { }
-  for _, v in ipairs(a) do
-    if p(v) then
-      table.insert(r, v)
-    end
-  end
-  return r
-end
-local Array__each
-Array__each = function(a, f)
-  for _, v in ipairs(a) do
-    f(v)
-  end
-end
 local is_table_array
 is_table_array = function(t)
   local _exp_0 = getmetatable(t)
-  if Array__metatable == _exp_0 then
+  if Array.metatable == _exp_0 then
     return true
   elseif StrMap__metatable == _exp_0 then
     return false
@@ -93,6 +66,7 @@ local M = {
   StringType = StringType,
   FunctionType = FunctionType
 }
+M.Array = Array.Array
 local static_method
 static_method = function(name, implementations, type_rep, builtin_type)
   local prefixed_name = 'fantasy-land/' .. name
@@ -159,7 +133,7 @@ has_metatable_method = function(name, implementations, value)
   if 'equals' == _exp_0 then
     if type(value) == 'table' then
       if is_table_array(value) then
-        return Array__all(value, M.Setoid.test)
+        return Array.all(value, M.Setoid.test)
       else
         return StrMap__all_values(value, M.Setoid.test)
       end
@@ -167,7 +141,7 @@ has_metatable_method = function(name, implementations, value)
   elseif 'lte' == _exp_0 then
     if type(value) == 'table' then
       if is_table_array(value) then
-        return Array__all(value, M.Ord.test)
+        return Array.all(value, M.Ord.test)
       else
         return StrMap__all_values(value, M.Ord.test)
       end
@@ -192,14 +166,11 @@ M.TypeClass = function(name, url, dependencies, test)
     name = name,
     url = url,
     test = function(x)
-      return Array__all(dependencies, function(d)
+      return Array.all(dependencies, function(d)
         return d.test(x)
       end) and test(x)
     end
   }, TypeClass__metatable)
-end
-M.Array = function(a)
-  return setmetatable(a or { }, Array__metatable)
 end
 M.StrMap = function(o)
   return setmetatable(o or { }, StrMap__metatable)
@@ -212,10 +183,10 @@ end
 local TypeClass__factory
 TypeClass__factory = function(name, dependencies, requirements)
   local version = '0.1.0'
-  local static_methods = Array__filter(requirements, function(req)
+  local static_methods = Array.filter(requirements, function(req)
     return req.location == Constructor
   end)
-  local metatable_methods = Array__filter(requirements, function(req)
+  local metatable_methods = Array.filter(requirements, function(req)
     return req.location == Value
   end)
   local type_class_test
@@ -228,9 +199,9 @@ TypeClass__factory = function(name, dependencies, requirements)
         seen[x] = true
       end
       local ok, err_or_result = pcall(function()
-        return Array__all(static_methods, function(sm)
+        return Array.all(static_methods, function(sm)
           return x ~= nil and static_method(sm.name, sm.implementations, getmetatable(x), value_to_static_builtin_type(x)) ~= nil
-        end) and Array__all(metatable_methods, function(mm)
+        end) and Array.all(metatable_methods, function(mm)
           return has_metatable_method(mm.name, mm.implementations, x)
         end)
       end)
@@ -245,7 +216,7 @@ TypeClass__factory = function(name, dependencies, requirements)
   end
   local type_class = M.TypeClass("alma.type-classes/" .. tostring(name), "https://github.com/mna/alma/tree/v" .. tostring(version) .. "/alma/type-classes#" .. tostring(name), dependencies, type_class_test({ }))
   type_class.methods = { }
-  Array__each(static_methods, function(sm)
+  Array.each(static_methods, function(sm)
     local arity, implementations
     arity, implementations, name = sm.arity, sm.implementations, sm.name
     local _exp_0 = arity
@@ -263,7 +234,7 @@ TypeClass__factory = function(name, dependencies, requirements)
       end
     end
   end)
-  Array__each(metatable_methods, function(mm)
+  Array.each(metatable_methods, function(mm)
     local arity, implementations
     arity, implementations, name = mm.arity, mm.implementations, mm.name
     local _exp_0 = arity
@@ -283,6 +254,16 @@ TypeClass__factory = function(name, dependencies, requirements)
   end)
   return type_class
 end
+M.Setoid = TypeClass__factory('Setoid', { }, {
+  {
+    name = 'equals',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.equals
+    }
+  }
+})
 M.Semigroupoid = TypeClass__factory('Semigroupoid', { }, {
   {
     name = 'compose',

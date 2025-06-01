@@ -1,30 +1,14 @@
 {:is_callable, :get_metavalue} = require 'alma.meta'
+Array = require 'alma.type-classes.Array'
 Function = require 'alma.type-classes.Function'
 
 -- Type metatables
 TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
-Array__metatable = {'@@type': 'alma.type-classes/Array@1'}
 StrMap__metatable = {'@@type': 'alma.type-classes/StrMap@1'}
-
--- Array helper functions.
-Array__all = (a, p) ->
-	for _, v in ipairs(a)
-		return false unless p(v)
-	true
-
-Array__filter = (a, p) ->
-	r = {}
-	for _, v in ipairs(a)
-		table.insert(r, v) if p(v)
-	r
-
-Array__each = (a, f) ->
-	for _, v in ipairs(a)
-		f(v)
 
 is_table_array = (t) ->
 	switch getmetatable(t)
-		when Array__metatable
+		when Array.metatable
 			-- explicitly an array
 			true
 		when StrMap__metatable
@@ -63,6 +47,7 @@ value_to_static_builtin_type = (value) ->
 
 -- Exported module
 M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
+M.Array = Array.Array
 
 -- finds the proper implementation of a static method for a given type
 -- representative; name must be the (unprefixed) name of the fantasy land
@@ -89,7 +74,6 @@ static_method = (name, implementations, type_rep, builtin_type) ->
 			implementations.Function
 		else
 			impl
-
 
 builtin_metatable_method = (implementations, value) ->
 	switch type(value)
@@ -120,7 +104,7 @@ has_metatable_method = (name, implementations, value) ->
 			-- each element in array or object must be a Setoid
 			if type(value) == 'table'
 				if is_table_array(value)
-					return Array__all(value, M.Setoid.test)
+					return Array.all(value, M.Setoid.test)
 				else
 					return StrMap__all_values(value, M.Setoid.test)
 
@@ -128,7 +112,7 @@ has_metatable_method = (name, implementations, value) ->
 			-- each element in array or object must be an Ord
 			if type(value) == 'table'
 				if is_table_array(value)
-					return Array__all(value, M.Ord.test)
+					return Array.all(value, M.Ord.test)
 				else
 					return StrMap__all_values(value, M.Ord.test)
 
@@ -147,16 +131,13 @@ M.TypeClass = (name, url, dependencies, test) ->
 	setmetatable({
 		name: name,
 		url: url,
-		test: (x) -> Array__all(dependencies, (d) -> d.test(x)) and test(x),
+		test: (x) -> Array.all(dependencies, (d) -> d.test(x)) and test(x),
 	}, TypeClass__metatable)
 
 -- Because Lua uses the same table data structure for arrays and objects, alma
 -- provides the Array and StrMap functions to create arrays and objects
 -- (StrMap, that is objects with string keys) with the correct metatables so
 -- they are recognized as such by the type class system, even when empty.
-M.Array = (a) ->
-	setmetatable(a or {}, Array__metatable)
-
 M.StrMap = (o) ->
 	setmetatable(o or {}, StrMap__metatable)
 
@@ -172,8 +153,8 @@ M.Callable = (c) -> (...) -> c(...)
 TypeClass__factory = (name, dependencies, requirements) ->
 	version = '0.1.0' -- updated via publish script
 
-	static_methods = Array__filter(requirements, (req) -> req.location == Constructor)
-	metatable_methods = Array__filter(requirements, (req) -> req.location == Value)
+	static_methods = Array.filter(requirements, (req) -> req.location == Constructor)
+	metatable_methods = Array.filter(requirements, (req) -> req.location == Value)
 
 	type_class_test = (seen) -> (x) ->
 		-- we use memoization because the test function can be called from within
@@ -187,11 +168,11 @@ TypeClass__factory = (name, dependencies, requirements) ->
 		seen[x] = true unless x == nil
 		ok, err_or_result = pcall(
 			->
-				Array__all(static_methods, (sm) ->
+				Array.all(static_methods, (sm) ->
 					x != nil and
 					static_method(sm.name, sm.implementations, getmetatable(x), value_to_static_builtin_type(x)) != nil
 				) and
-				Array__all(metatable_methods, (mm) ->
+				Array.all(metatable_methods, (mm) ->
 					has_metatable_method(mm.name, mm.implementations, x)
 				)
 		)
@@ -208,7 +189,7 @@ TypeClass__factory = (name, dependencies, requirements) ->
 
 	type_class.methods = {}
 
-	Array__each(static_methods, (sm) ->
+	Array.each(static_methods, (sm) ->
 		{:arity, :implementations, :name} = sm
 		type_class.methods[name] = switch arity
 			when 0
@@ -219,7 +200,7 @@ TypeClass__factory = (name, dependencies, requirements) ->
 				(type_rep, a, b) -> (static_method(name, implementations, type_rep)(a, b))
 	)
 
-	Array__each(metatable_methods, (mm) ->
+	Array.each(metatable_methods, (mm) ->
 		{:arity, :implementations, :name} = mm
 		type_class.methods[name] = switch arity
 			when 0
@@ -235,6 +216,36 @@ TypeClass__factory = (name, dependencies, requirements) ->
 -- ---------------------------
 -- Fantasy Land type classes
 -- ---------------------------
+
+M.Setoid = TypeClass__factory('Setoid', {}, {
+	{
+		name: 'equals',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.equals,
+		},
+	},
+})
+  -- Z.Setoid = $ ('Setoid', [], [{
+  --   name: 'equals',
+  --   location: Value,
+  --   arity: 1,
+  --   implementations: {
+  --     Arguments: Arguments$prototype$equals,
+  --     Array: Array$prototype$equals,
+  --     Boolean: Boolean$prototype$equals,
+  --     Date: Date$prototype$equals,
+  --     Error: Error$prototype$equals,
+  --     Function: Function$prototype$equals,
+  --     Null: Null$prototype$equals,
+  --     Number: Number$prototype$equals,
+  --     Object: Object$prototype$equals,
+  --     RegExp: RegExp$prototype$equals,
+  --     String: String$prototype$equals,
+  --     Undefined: Undefined$prototype$equals,
+  --   },
+  -- }]);
 
 M.Semigroupoid = TypeClass__factory('Semigroupoid', {}, {
 	{

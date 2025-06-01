@@ -34,7 +34,6 @@ is_table_array = (t) ->
 			-- empty table or non-empty array part is considered array
 			(#t > 0) or (next(t) == nil)
 
-
 -- StrMap helper functions.
 StrMap__all_values = (o, p) ->
 	for _, v in pairs(o)
@@ -50,6 +49,18 @@ StrMapType = {name: 'StrMap'}
 StringType = {name: 'String'}
 FunctionType = {name: 'Function'}
 
+value_to_static_builtin_type = (value) ->
+	switch type(value)
+		when 'string'
+			StringType
+		when 'function'
+			FunctionType
+		when 'table'
+			if is_table_array(value)
+				ArrayType
+			else
+				StrMapType
+
 -- Exported module
 M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
 
@@ -58,20 +69,27 @@ M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
 -- method, implementations the list of available implementations, and type_rep
 -- is either the metatable of the value, or a alma.type-classes type
 -- representative for one of the built-in types.
-static_method = (name, implementations, type_rep) ->
-	switch type_rep
-		when ArrayType
-			return implementations.Array
-		when StrMapType
-			return implementations.StrMap
-		when StringType
-			return implementations.String
-		when FunctionType
-			return implementations.Function
-
+static_method = (name, implementations, type_rep, builtin_type) ->
 	prefixed_name = 'fantasy-land/' .. name
-	if is_callable(type_rep[prefixed_name])
-		return type_rep[prefixed_name]
+	impl = if type_rep != nil and is_callable(type_rep[prefixed_name])
+		type_rep[prefixed_name]
+
+	return switch builtin_type != nil and builtin_type or type_rep
+		when ArrayType
+			return impl if impl
+			implementations.Array
+		when StrMapType
+			return impl if impl
+			implementations.StrMap
+		when StringType
+			return impl if impl
+			implementations.String
+		when FunctionType
+			return impl if impl
+			implementations.Function
+		else
+			impl
+
 
 builtin_metatable_method = (implementations, value) ->
 	switch type(value)
@@ -143,7 +161,7 @@ M.StrMap = (o) ->
 	setmetatable(o or {}, StrMap__metatable)
 
 -- Callable Lua values do not satisfy the built-in Function type when testing
--- for type classes because it would be ambiguous - should a table with a 
+-- for type classes because it would be ambiguous - should a table with a
 -- __call metamethod be considered a Function or an array? So we provide a
 -- helper function to create a Function from a callable (it simply wraps the
 -- callable function call in a function).
@@ -171,7 +189,7 @@ TypeClass__factory = (name, dependencies, requirements) ->
 			->
 				Array__all(static_methods, (sm) ->
 					x != nil and
-					static_method(sm.name, sm.implementations, getmetatable(x)) != nil
+					static_method(sm.name, sm.implementations, getmetatable(x), value_to_static_builtin_type(x)) != nil
 				) and
 				Array__all(metatable_methods, (mm) ->
 					has_metatable_method(mm.name, mm.implementations, x)

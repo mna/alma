@@ -72,6 +72,21 @@ local StringType = {
 local FunctionType = {
   name = 'Function'
 }
+local value_to_static_builtin_type
+value_to_static_builtin_type = function(value)
+  local _exp_0 = type(value)
+  if 'string' == _exp_0 then
+    return StringType
+  elseif 'function' == _exp_0 then
+    return FunctionType
+  elseif 'table' == _exp_0 then
+    if is_table_array(value) then
+      return ArrayType
+    else
+      return StrMapType
+    end
+  end
+end
 local M = {
   ArrayType = ArrayType,
   StrMapType = StrMapType,
@@ -79,20 +94,35 @@ local M = {
   FunctionType = FunctionType
 }
 local static_method
-static_method = function(name, implementations, type_rep)
-  local _exp_0 = type_rep
+static_method = function(name, implementations, type_rep, builtin_type)
+  local prefixed_name = 'fantasy-land/' .. name
+  local impl
+  if type_rep ~= nil and is_callable(type_rep[prefixed_name]) then
+    impl = type_rep[prefixed_name]
+  end
+  local _exp_0 = builtin_type ~= nil and builtin_type or type_rep
   if ArrayType == _exp_0 then
+    if impl then
+      return impl
+    end
     return implementations.Array
   elseif StrMapType == _exp_0 then
+    if impl then
+      return impl
+    end
     return implementations.StrMap
   elseif StringType == _exp_0 then
+    if impl then
+      return impl
+    end
     return implementations.String
   elseif FunctionType == _exp_0 then
+    if impl then
+      return impl
+    end
     return implementations.Function
-  end
-  local prefixed_name = 'fantasy-land/' .. name
-  if is_callable(type_rep[prefixed_name]) then
-    return type_rep[prefixed_name]
+  else
+    return impl
   end
 end
 local builtin_metatable_method
@@ -199,7 +229,7 @@ TypeClass__factory = function(name, dependencies, requirements)
       end
       local ok, err_or_result = pcall(function()
         return Array__all(static_methods, function(sm)
-          return x ~= nil and static_method(sm.name, sm.implementations, getmetatable(x)) ~= nil
+          return x ~= nil and static_method(sm.name, sm.implementations, getmetatable(x), value_to_static_builtin_type(x)) ~= nil
         end) and Array__all(metatable_methods, function(mm)
           return has_metatable_method(mm.name, mm.implementations, x)
         end)

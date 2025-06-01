@@ -1,6 +1,14 @@
+table = require 'table'
 {:is_callable, :get_metavalue} = require 'alma.meta'
-Array = require 'alma.type-classes.Array'
-Function = require 'alma.type-classes.Function'
+
+-- declare the module immediately to pass it to the sub-modules and break
+-- circular dependencies
+M = {}
+Array = require('alma.type-classes.Array')(M)
+Boolean = require('alma.type-classes.Boolean')(M)
+Function = require('alma.type-classes.Function')(M)
+Nil = require('alma.type-classes.Nil')(M)
+Number = require('alma.type-classes.Number')(M)
 
 -- Type metatables
 TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
@@ -28,26 +36,23 @@ StrMap__all_values = (o, p) ->
 Constructor = 'Constructor'
 Value = 'Value'
 
-ArrayType = {name: 'Array'}
-StrMapType = {name: 'StrMap'}
-StringType = {name: 'String'}
-FunctionType = {name: 'Function'}
+M.ArrayType = {name: 'Array'}
+M.StrMapType = {name: 'StrMap'}
+M.StringType = {name: 'String'}
+M.FunctionType = {name: 'Function'}
+M.Array = Array.Array
 
 value_to_static_builtin_type = (value) ->
 	switch type(value)
 		when 'string'
-			StringType
+			M.StringType
 		when 'function'
-			FunctionType
+			M.FunctionType
 		when 'table'
 			if is_table_array(value)
-				ArrayType
+				M.ArrayType
 			else
-				StrMapType
-
--- Exported module
-M = {:ArrayType, :StrMapType, :StringType, :FunctionType}
-M.Array = Array.Array
+				M.StrMapType
 
 -- finds the proper implementation of a static method for a given type
 -- representative; name must be the (unprefixed) name of the fantasy land
@@ -60,16 +65,16 @@ static_method = (name, implementations, type_rep, builtin_type) ->
 		type_rep[prefixed_name]
 
 	return switch builtin_type != nil and builtin_type or type_rep
-		when ArrayType
+		when M.ArrayType
 			return impl if impl
 			implementations.Array
-		when StrMapType
+		when M.StrMapType
 			return impl if impl
 			implementations.StrMap
-		when StringType
+		when M.StringType
 			return impl if impl
 			implementations.String
-		when FunctionType
+		when M.FunctionType
 			return impl if impl
 			implementations.Function
 		else
@@ -224,6 +229,10 @@ M.Setoid = TypeClass__factory('Setoid', {}, {
 		arity: 1,
 		implementations: {
 			Array: Array.equals,
+			Boolean: Boolean.equals,
+			Function: Function.equals,
+			Nil: Nil.equals,
+			Number: Number.equals,
 		},
 	},
 })
@@ -232,18 +241,8 @@ M.Setoid = TypeClass__factory('Setoid', {}, {
   --   location: Value,
   --   arity: 1,
   --   implementations: {
-  --     Arguments: Arguments$prototype$equals,
-  --     Array: Array$prototype$equals,
-  --     Boolean: Boolean$prototype$equals,
-  --     Date: Date$prototype$equals,
-  --     Error: Error$prototype$equals,
-  --     Function: Function$prototype$equals,
-  --     Null: Null$prototype$equals,
-  --     Number: Number$prototype$equals,
   --     Object: Object$prototype$equals,
-  --     RegExp: RegExp$prototype$equals,
   --     String: String$prototype$equals,
-  --     Undefined: Undefined$prototype$equals,
   --   },
   -- }]);
 
@@ -268,5 +267,25 @@ M.Category = TypeClass__factory('Category', {M.Semigroupoid}, {
 		},
 	},
 })
+
+-- -------------------------------------------
+-- Fantasy-Land functions for each type class
+-- -------------------------------------------
+
+do
+	-- pairs :: Array (Array2 Any Any)
+	pairs = {} -- cache of pairs of values to compare
+
+	M.equals = (x, y) ->
+		-- This algorithm for comparing circular data structures was
+		-- suggested in <http://stackoverflow.com/a/40622794/312785>.
+		if Array.some(pairs, (p) -> p[1] == x and p[2] == y)
+			return true
+
+		table.insert(pairs, {x, y})
+		ok, err_or_result = pcall(M.Setoid.methods.equals, y, x)
+		table.remove(pairs)
+		error(err_or_result) unless ok
+		err_or_result
 
 M

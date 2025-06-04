@@ -62,5 +62,16 @@ return function(Z)
     end
     return true
   end
+  M.lte = function(self, other)
+    for i = 1, #self do
+      if i > #other then
+        return false
+      end
+      if not Z.equals(self[i], other[i]) then
+        return Z.lte(self[i], other[i])
+      end
+    end
+    return true
+  end
   return M
 end

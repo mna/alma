@@ -11,4 +11,7 @@ local M
   -- Boolean.equals :: Boolean ~> Boolean -> Boolean
 	M.equals = (other) => @ == other
 
+  -- Boolean.lte :: Boolean ~> Boolean -> Boolean
+	M.lte = (other) => (@ == false) or (other == true)
+
 	M

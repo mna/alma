@@ -46,5 +46,28 @@ return function(Z)
     end
     return true
   end
+  M.lte = function(self, other)
+    local self_keys = sorted_keys(self)
+    local other_keys = sorted_keys(other)
+    while (true) do
+      if #self_keys == 0 then
+        return true
+      end
+      if #other_keys == 0 then
+        return false
+      end
+      local k = table.remove(self_keys, 1)
+      local z = table.remove(other_keys, 1)
+      if k < z then
+        return true
+      end
+      if k > z then
+        return false
+      end
+      if not Z.equals(self[k], other[k]) then
+        return Z.lte(self[k], other[k])
+      end
+    end
+  end
   return M
 end

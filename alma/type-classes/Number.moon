@@ -13,4 +13,7 @@ is_NaN = (n) -> n != n
   -- Number.equals :: Number ~> Number -> Boolean
 	M.equals = (other) => (@ == other) or (is_NaN(@) and is_NaN(other))
 
+  -- Number.lte :: Number ~> Number -> Boolean
+	M.lte = (other) => (is_NaN(@)) or (@ <= other)
+
 	M

@@ -7,5 +7,8 @@ return function(Z)
   M.equals = function(self, other)
     return true
   end
+  M.lte = function(self, other)
+    return true
+  end
   return M
 end

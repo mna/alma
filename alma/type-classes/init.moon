@@ -227,6 +227,22 @@ M.Setoid = TypeClass__factory('Setoid', {}, {
 	},
 })
 
+M.Ord = TypeClass__factory('Ord', {M.Setoid}, {
+	{
+		name: 'lte',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.lte,
+			Boolean: Boolean.lte,
+			Nil: Nil.lte,
+			Number: Number.lte,
+			String: String.lte,
+			StrMap: StrMap.lte,
+		},
+	},
+})
+
 M.Semigroupoid = TypeClass__factory('Semigroupoid', {}, {
 	{
 		name: 'compose',
@@ -265,6 +281,22 @@ do
 
 		table.insert(pairs, {x, y})
 		ok, err_or_result = pcall(M.Setoid.methods.equals, y, x)
+		table.remove(pairs)
+		error(err_or_result) unless ok
+		err_or_result
+
+do
+	-- pairs :: Array (Array2 Any Any)
+	pairs = {} -- cache of pairs of values to compare
+
+	M.lte = (x, y) ->
+		-- This algorithm for comparing circular data structures was
+		-- suggested in <http://stackoverflow.com/a/40622794/312785>.
+		if Array.some(pairs, (p) -> p[1] == x and p[2] == y)
+			return M.equals(x, y)
+
+		table.insert(pairs, {x, y})
+		ok, err_or_result = pcall(M.Ord.methods.lte, y, x)
 		table.remove(pairs)
 		error(err_or_result) unless ok
 		err_or_result

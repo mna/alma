@@ -257,6 +257,23 @@ M.Setoid = TypeClass__factory('Setoid', { }, {
     }
   }
 })
+M.Ord = TypeClass__factory('Ord', {
+  M.Setoid
+}, {
+  {
+    name = 'lte',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.lte,
+      Boolean = Boolean.lte,
+      Nil = Nil.lte,
+      Number = Number.lte,
+      String = String.lte,
+      StrMap = StrMap.lte
+    }
+  }
+})
 M.Semigroupoid = TypeClass__factory('Semigroupoid', { }, {
   {
     name = 'compose',
@@ -292,6 +309,26 @@ do
       y
     })
     local ok, err_or_result = pcall(M.Setoid.methods.equals, y, x)
+    table.remove(pairs)
+    if not (ok) then
+      error(err_or_result)
+    end
+    return err_or_result
+  end
+end
+do
+  local pairs = { }
+  M.lte = function(x, y)
+    if Array.some(pairs, function(p)
+      return p[1] == x and p[2] == y
+    end) then
+      return M.equals(x, y)
+    end
+    table.insert(pairs, {
+      x,
+      y
+    })
+    local ok, err_or_result = pcall(M.Ord.methods.lte, y, x)
     table.remove(pairs)
     if not (ok) then
       error(err_or_result)

@@ -50,6 +50,14 @@ local M
 				return false
 		true
 
+	-- Array.lte :: Ord a => Array a ~> Array a -> Boolean
+	M.lte = (other) =>
+		for i = 1, #@
+			return false if i > #other
+			if not Z.equals(@[i], other[i]) then
+				return Z.lte(@[i], other[i])
+		true
+
 	M
 		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
 		-- const Array$chainRec = (f, x) => {
@@ -75,17 +83,6 @@ local M
 		--   }
 		--   return result;
 		-- };
-		-- //  Array$prototype$lte :: Ord a => Array a ~> Array a -> Boolean
-		-- function Array$prototype$lte(other) {
-		--   for (let idx = 0; true; idx += 1) {
-		--     if (idx === this.length) break;
-		--     if (idx === other.length) return false;
-		--     if (!(Z.equals (this[idx], other[idx]))) {
-		--       return Z.lte (this[idx], other[idx]);
-		--     }
-		--   }
-		--   return true;
-		-- }
 		--
 		-- //  Array$prototype$concat :: Array a ~> Array a -> Array a
 		-- function Array$prototype$concat(other) {

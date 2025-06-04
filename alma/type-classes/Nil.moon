@@ -8,7 +8,10 @@ local M
 
 	M = {}
 
-  -- Nil.equals :: Null ~> Null -> Boolean
+  -- Nil.equals :: Nil ~> Nil -> Boolean
 	M.equals = (other) => true
+
+  -- Null.lte :: Nil ~> Nil -> Boolean
+	M.lte = (other) => true
 
 	M

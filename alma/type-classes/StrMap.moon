@@ -45,23 +45,24 @@ sorted_keys = (o) ->
 				return false
 		true
 
+  -- StrMap.lte :: Ord a => StrMap a ~> StrMap a -> Boolean
+	M.lte = (other) =>
+		self_keys = sorted_keys(@)
+		other_keys = sorted_keys(other)
+		while (true)
+			return true if #self_keys == 0
+			return false if #other_keys == 0
+
+			k = table.remove(self_keys, 1)
+			z = table.remove(other_keys, 1)
+			return true if k < z
+			return false if k > z
+
+			if not Z.equals(@[k], other[k])
+				return Z.lte(@[k], other[k])
+
 	M
 
-  -- //  Object$prototype$lte :: Ord a => StrMap a ~> StrMap a -> Boolean
-  -- function Object$prototype$lte(other) {
-  --   const theseKeys = sortedKeys (this);
-  --   const otherKeys = sortedKeys (other);
-  --   while (true) {
-  --     if (theseKeys.length === 0) return true;
-  --     if (otherKeys.length === 0) return false;
-  --     const k = theseKeys.shift ();
-  --     const z = otherKeys.shift ();
-  --     if (k < z) return true;
-  --     if (k > z) return false;
-  --     if (!(Z.equals (this[k], other[k]))) return Z.lte (this[k], other[k]);
-  --   }
-  -- }
-  --
   -- //  Object$prototype$concat :: StrMap a ~> StrMap a -> StrMap a
   -- function Object$prototype$concat(other) {
   --   const result = {};

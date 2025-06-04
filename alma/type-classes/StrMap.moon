@@ -18,7 +18,7 @@ sorted_keys = (o) ->
 
 	M = {}
 
-	M.metatable = {'@@type': 'alma.type-classes/StrMap@1'}
+	M.metatable = {}
 
 	M.StrMap = (o) ->
 		setmetatable(o or {}, M.metatable)

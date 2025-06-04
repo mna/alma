@@ -14,9 +14,7 @@ return function(Z)
     error('alma.type-classes.StrMap required more than once')
   end
   M = { }
-  M.metatable = {
-    ['@@type'] = 'alma.type-classes/StrMap@1'
-  }
+  M.metatable = { }
   M.StrMap = function(o)
     return setmetatable(o or { }, M.metatable)
   end

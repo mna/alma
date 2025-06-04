@@ -119,6 +119,11 @@ has_metatable_method = function(name, implementations, value)
   if get_metavalue(value, prefixed_name, is_callable) then
     return true
   end
+  if get_metavalue(value, '@@type', function(v)
+    return type(v) == 'string'
+  end) then
+    return false
+  end
   local _exp_0 = name
   if 'equals' == _exp_0 then
     if type(value) == 'table' then

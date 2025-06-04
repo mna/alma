@@ -61,6 +61,202 @@ describe('TypeClass', function()
     }))
   end)
 end)
+describe('Setoid', function()
+  local Setoid, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Setoid, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Setoid, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Setoid))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Setoid', Setoid.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Setoid", Setoid.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = true,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = true,
+        value = ''
+      },
+      {
+        want = true,
+        value = 0
+      },
+      {
+        want = true,
+        value = true
+      },
+      {
+        want = true,
+        value = { }
+      },
+      {
+        want = true,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = true,
+        value = Array()
+      },
+      {
+        want = true,
+        value = StrMap()
+      },
+      {
+        want = true,
+        value = math.abs
+      },
+      {
+        want = true,
+        value = callable
+      },
+      {
+        want = true,
+        value = Callable(callable)
+      },
+      {
+        want = true,
+        value = {
+          function() end
+        }
+      },
+      {
+        want = true,
+        value = {
+          a = function() end
+        }
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Setoid.test(c.value)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
+    end
+  end)
+end)
+describe('Ord', function()
+  local Ord, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Ord, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Ord, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Ord))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Ord', Ord.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Ord", Ord.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = true,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = true,
+        value = ''
+      },
+      {
+        want = true,
+        value = 0
+      },
+      {
+        want = true,
+        value = true
+      },
+      {
+        want = true,
+        value = { }
+      },
+      {
+        want = true,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = true,
+        value = Array()
+      },
+      {
+        want = true,
+        value = StrMap()
+      },
+      {
+        want = false,
+        value = math.abs
+      },
+      {
+        want = true,
+        value = callable
+      },
+      {
+        want = false,
+        value = Callable(callable)
+      },
+      {
+        want = false,
+        value = {
+          function() end
+        }
+      },
+      {
+        want = false,
+        value = {
+          a = function() end
+        }
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Ord.test(c.value)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
+    end
+  end)
+end)
 describe('Semigroupoid', function()
   local Semigroupoid, Array, Callable, StrMap, identifier_of
   setup(function()
@@ -143,7 +339,7 @@ describe('Semigroupoid', function()
     }
     for _, c in ipairs(cases) do
       local got = Semigroupoid.test(c.value)
-      assert.are.equal(c.want, got)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
     end
   end)
 end)
@@ -229,7 +425,7 @@ return describe('Category', function()
     }
     for _, c in ipairs(cases) do
       local got = Category.test(c.value)
-      assert.are.equal(c.want, got)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
     end
   end)
 end)

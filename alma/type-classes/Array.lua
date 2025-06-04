@@ -4,9 +4,7 @@ return function(Z)
     error('alma.type-classes.Array required more than once')
   end
   M = { }
-  M.metatable = {
-    ['@@type'] = 'alma.type-classes/Array@1'
-  }
+  M.metatable = { }
   M.Array = function(a)
     return setmetatable(a or { }, M.metatable)
   end

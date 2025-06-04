@@ -94,10 +94,17 @@ builtin_metatable_method = (implementations, value) ->
 				implementations.StrMap
 
 has_metatable_method = (name, implementations, value) ->
+	-- technically, nil value can have a metatable that could implement the
+	-- fantasy-land method, but that seems more like a way to break things than
+	-- anything useful.
 	return (implementations.Nil != nil) if value == nil
 
 	prefixed_name = 'fantasy-land/' .. name
 	return true if get_metavalue(value, prefixed_name, is_callable)
+
+	-- if the value has a @@type, then it is a custom type, do not fallback to
+	-- built-in types.
+	return false if get_metavalue(value, '@@type', (v) -> type(v) == 'string')
 
 	switch name
 		when 'equals'

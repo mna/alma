@@ -8,7 +8,7 @@ local M
 
 	M = {}
 
-	M.metatable = {'@@type': 'alma.type-classes/Array@1'}
+	M.metatable = {}
 
 	M.Array = (a) ->
 		setmetatable(a or {}, M.metatable)

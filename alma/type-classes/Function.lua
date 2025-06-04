@@ -1,7 +1,7 @@
 local M
 return function(Z)
   if M ~= nil then
-    error('alma.type-classes.Array required more than once')
+    error('alma.type-classes.Function required more than once')
   end
   M = { }
   M.identity = function(x)
@@ -14,6 +14,9 @@ return function(Z)
     return function(x)
       return other(self(x))
     end
+  end
+  M.equals = function(self, other)
+    return other == self
   end
   return M
 end

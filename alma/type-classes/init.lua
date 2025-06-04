@@ -1,3 +1,4 @@
+local table = require('table')
 local is_callable, get_metavalue
 do
   local _obj_0 = require('alma.meta')
@@ -5,32 +6,25 @@ do
 end
 local M = { }
 local Array = require('alma.type-classes.Array')(M)
+local Boolean = require('alma.type-classes.Boolean')(M)
 local Function = require('alma.type-classes.Function')(M)
+local Nil = require('alma.type-classes.Nil')(M)
+local Number = require('alma.type-classes.Number')(M)
+local String = require('alma.type-classes.String')(M)
+local StrMap = require('alma.type-classes.StrMap')(M)
 local TypeClass__metatable = {
   ['@@type'] = 'alma.type-classes/TypeClass@1'
-}
-local StrMap__metatable = {
-  ['@@type'] = 'alma.type-classes/StrMap@1'
 }
 local is_table_array
 is_table_array = function(t)
   local _exp_0 = getmetatable(t)
   if Array.metatable == _exp_0 then
     return true
-  elseif StrMap__metatable == _exp_0 then
+  elseif StrMap.metatable == _exp_0 then
     return false
   else
     return (#t > 0) or (next(t) == nil)
   end
-end
-local StrMap__all_values
-StrMap__all_values = function(o, p)
-  for _, v in pairs(o) do
-    if not (p(v)) then
-      return false
-    end
-  end
-  return true
 end
 local Constructor = 'Constructor'
 local Value = 'Value'
@@ -47,6 +41,7 @@ M.FunctionType = {
   name = 'Function'
 }
 M.Array = Array.Array
+M.StrMap = StrMap.StrMap
 local value_to_static_builtin_type
 value_to_static_builtin_type = function(value)
   local _exp_0 = type(value)
@@ -130,7 +125,7 @@ has_metatable_method = function(name, implementations, value)
       if is_table_array(value) then
         return Array.all(value, M.Setoid.test)
       else
-        return StrMap__all_values(value, M.Setoid.test)
+        return StrMap.all_values(value, M.Setoid.test)
       end
     end
   elseif 'lte' == _exp_0 then
@@ -138,7 +133,7 @@ has_metatable_method = function(name, implementations, value)
       if is_table_array(value) then
         return Array.all(value, M.Ord.test)
       else
-        return StrMap__all_values(value, M.Ord.test)
+        return StrMap.all_values(value, M.Ord.test)
       end
     end
   end
@@ -166,9 +161,6 @@ M.TypeClass = function(name, url, dependencies, test)
       end) and test(x)
     end
   }, TypeClass__metatable)
-end
-M.StrMap = function(o)
-  return setmetatable(o or { }, StrMap__metatable)
 end
 M.Callable = function(c)
   return function(...)
@@ -255,7 +247,13 @@ M.Setoid = TypeClass__factory('Setoid', { }, {
     location = Value,
     arity = 1,
     implementations = {
-      Array = Array.equals
+      Array = Array.equals,
+      Boolean = Boolean.equals,
+      Function = Function.equals,
+      Nil = Nil.equals,
+      Number = Number.equals,
+      String = String.equals,
+      StrMap = StrMap.equals
     }
   }
 })
@@ -281,4 +279,24 @@ M.Category = TypeClass__factory('Category', {
     }
   }
 })
+do
+  local pairs = { }
+  M.equals = function(x, y)
+    if Array.some(pairs, function(p)
+      return p[1] == x and p[2] == y
+    end) then
+      return true
+    end
+    table.insert(pairs, {
+      x,
+      y
+    })
+    local ok, err_or_result = pcall(M.Setoid.methods.equals, y, x)
+    table.remove(pairs)
+    if not (ok) then
+      error(err_or_result)
+    end
+    return err_or_result
+  end
+end
 return M

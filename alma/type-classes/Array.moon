@@ -42,6 +42,7 @@ local M
 	-- Array.zero :: () -> Array a
 	M.zero = () -> M.Array({})
 
+  -- Array.equals :: Setoid a => Array a ~> Array a -> Boolean
 	M.equals = (other) =>
 		return false if #other != #@
 		for i = 1, #@
@@ -158,13 +159,3 @@ local M
 		--   return this.map ((_, idx, xs) => f (xs.slice (idx)));
 		-- }
 		--
-		-- //  Arguments$prototype$equals :: Arguments ~> Arguments -> Boolean
-		-- function Arguments$prototype$equals(other) {
-		--   return Array$prototype$equals.call (this, other);
-		-- }
-		--
-		-- //  Arguments$prototype$lte :: Arguments ~> Arguments -> Boolean
-		-- function Arguments$prototype$lte(other) {
-		--   return Array$prototype$lte.call (this, other);
-		-- }
-

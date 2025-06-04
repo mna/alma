@@ -9,28 +9,22 @@ Boolean = require('alma.type-classes.Boolean')(M)
 Function = require('alma.type-classes.Function')(M)
 Nil = require('alma.type-classes.Nil')(M)
 Number = require('alma.type-classes.Number')(M)
+String = require('alma.type-classes.String')(M)
+StrMap = require('alma.type-classes.StrMap')(M)
 
--- Type metatables
 TypeClass__metatable = {'@@type': 'alma.type-classes/TypeClass@1'}
-StrMap__metatable = {'@@type': 'alma.type-classes/StrMap@1'}
 
 is_table_array = (t) ->
 	switch getmetatable(t)
 		when Array.metatable
 			-- explicitly an array
 			true
-		when StrMap__metatable
+		when StrMap.metatable
 			-- explicitly a StrMap object
 			false
 		else
 			-- empty table or non-empty array part is considered array
 			(#t > 0) or (next(t) == nil)
-
--- StrMap helper functions.
-StrMap__all_values = (o, p) ->
-	for _, v in pairs(o)
-		return false unless p(v)
-	true
 
 -- Location data type = Constructor | Value
 Constructor = 'Constructor'
@@ -41,6 +35,7 @@ M.StrMapType = {name: 'StrMap'}
 M.StringType = {name: 'String'}
 M.FunctionType = {name: 'Function'}
 M.Array = Array.Array
+M.StrMap = StrMap.StrMap
 
 value_to_static_builtin_type = (value) ->
 	switch type(value)
@@ -111,7 +106,7 @@ has_metatable_method = (name, implementations, value) ->
 				if is_table_array(value)
 					return Array.all(value, M.Setoid.test)
 				else
-					return StrMap__all_values(value, M.Setoid.test)
+					return StrMap.all_values(value, M.Setoid.test)
 
 		when 'lte'
 			-- each element in array or object must be an Ord
@@ -119,7 +114,7 @@ has_metatable_method = (name, implementations, value) ->
 				if is_table_array(value)
 					return Array.all(value, M.Ord.test)
 				else
-					return StrMap__all_values(value, M.Ord.test)
+					return StrMap.all_values(value, M.Ord.test)
 
 	builtin_metatable_method(implementations, value) != nil
 
@@ -138,13 +133,6 @@ M.TypeClass = (name, url, dependencies, test) ->
 		url: url,
 		test: (x) -> Array.all(dependencies, (d) -> d.test(x)) and test(x),
 	}, TypeClass__metatable)
-
--- Because Lua uses the same table data structure for arrays and objects, alma
--- provides the Array and StrMap functions to create arrays and objects
--- (StrMap, that is objects with string keys) with the correct metatables so
--- they are recognized as such by the type class system, even when empty.
-M.StrMap = (o) ->
-	setmetatable(o or {}, StrMap__metatable)
 
 -- Callable Lua values do not satisfy the built-in Function type when testing
 -- for type classes because it would be ambiguous - should a table with a
@@ -233,18 +221,11 @@ M.Setoid = TypeClass__factory('Setoid', {}, {
 			Function: Function.equals,
 			Nil: Nil.equals,
 			Number: Number.equals,
+			String: String.equals,
+			StrMap: StrMap.equals,
 		},
 	},
 })
-  -- Z.Setoid = $ ('Setoid', [], [{
-  --   name: 'equals',
-  --   location: Value,
-  --   arity: 1,
-  --   implementations: {
-  --     Object: Object$prototype$equals,
-  --     String: String$prototype$equals,
-  --   },
-  -- }]);
 
 M.Semigroupoid = TypeClass__factory('Semigroupoid', {}, {
 	{

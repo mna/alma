@@ -18,6 +18,14 @@ return function(Z)
     end
     return true
   end
+  M.some = function(a, p)
+    for _, v in ipairs(a) do
+      if p(v) then
+        return true
+      end
+    end
+    return false
+  end
   M.filter = function(a, p)
     local r = M.Array()
     for _, v in ipairs(a) do

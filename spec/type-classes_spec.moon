@@ -43,11 +43,12 @@ describe 'TypeClass', ->
 		assert.is_false(Bar.test({foo: ->, bar: 'not a func'}))
 
 describe 'Setoid', ->
-	local Setoid, Array, Callable, StrMap, identifier_of
+	local Setoid, Array, Callable, StrMap, identifier_of, Useless
 
 	setup ->
 		{:Array, :Callable, :Setoid, :StrMap} = require 'alma.type-classes'
 		{:identifier_of} = require 'alma.type-identifiers'
+		{:Useless} = require 'alma.useless'
 
 	it 'is a TypeClass', ->
 		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Setoid))
@@ -76,16 +77,13 @@ describe 'Setoid', ->
 			{want: true, value: Callable(callable)},
 			{want: true, value: {->}},
 			{want: true, value: {a:->}},
+			{want: false, value: Useless},
+			{want: false, value: {Useless}},
+			{want: false, value: {foo: Useless}},
 		}
 		for _, c in ipairs(cases)
 			got = Setoid.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
--- test ('Setoid', () => {
---   eq (Z.Setoid.test (Useless), false);
---   eq (Z.Setoid.test ([Useless]), false);
---   eq (Z.Setoid.test ({foo: Useless}), false);
--- });
 
 describe 'Ord', ->
 	local Ord, Array, Callable, StrMap, identifier_of

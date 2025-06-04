@@ -62,13 +62,14 @@ describe('TypeClass', function()
   end)
 end)
 describe('Setoid', function()
-  local Setoid, Array, Callable, StrMap, identifier_of
+  local Setoid, Array, Callable, StrMap, identifier_of, Useless
   setup(function()
     do
       local _obj_0 = require('alma.type-classes')
       Array, Callable, Setoid, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Setoid, _obj_0.StrMap
     end
     identifier_of = require('alma.type-identifiers').identifier_of
+    Useless = require('alma.useless').Useless
   end)
   it('is a TypeClass', function()
     return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Setoid))
@@ -150,6 +151,22 @@ describe('Setoid', function()
         want = true,
         value = {
           a = function() end
+        }
+      },
+      {
+        want = false,
+        value = Useless
+      },
+      {
+        want = false,
+        value = {
+          Useless
+        }
+      },
+      {
+        want = false,
+        value = {
+          foo = Useless
         }
       }
     }

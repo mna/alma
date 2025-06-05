@@ -263,6 +263,10 @@ describe 'equals', ->
 			{want: true, v1: ones_, v2: ones},
 
 			{want: true, v1: Z.StrMap({}), v2: Z.StrMap({})},
+			{want: true, v1: Z.StrMap({}), v2: {}}, -- empty array and empty object are undistinguishable
+			{want: true, v1: {}, v2: Z.StrMap({})}, 
+			{want: true, v1: Z.Array({}), v2: Z.StrMap({})}, 
+			{want: true, v1: Z.StrMap({}), v2: Z.Array({})}, 
 			{want: true, v1: {x: 1, y: 2}, v2: {y: 2, x: 1}},
 			{want: false, v1: {x: 1, y: 2, z: 3}, v2: {y: 2, x: 1}},
 			{want: false, v1: {x: 1, y: 2}, v2: {z: 3, y: 2, x: 1}},
@@ -280,38 +284,99 @@ describe 'equals', ->
 
 			{want: true, v1: math.sin, v2: math.sin},
 			{want: false, v1: math.sin, v2: math.cos},
+
+			-- TODO: add cases for Maybe, Identity, other custom types
+			-- TODO: add property based testing?
 		}
 		for _, c in ipairs(cases)
 			got = Z.equals(c.v1, c.v2)
 			assert.are.equal(c.want, got, "values: #{inspect(c.v1)}, #{inspect(c.v2)}")
 
--- test ('equals', () => {
---   const {nestedSetoidArb} = jsc.letrec (tie => ({
---     builtinSetoidArb: jsc.record ({
---       value: tie ('nestedSetoidArb'),
---     }),
---     customSetoidArb: jsc.record ({
---       'value': tie ('nestedSetoidArb'),
---       '@@type': jsc.constant ('sanctuary-type-classes/CustomSetoid@1'),
---       '@@show': jsc.constant (function() { return `CustomSetoid (${show (this.value)})`; }),
---       'fantasy-land/equals': jsc.constant (function(other) {
---         return Z.equals (this.value, other.value);
---       }),
---     }),
---     nestedSetoidArb: jsc.oneof ([
---       tie ('builtinSetoidArb'),
---       tie ('customSetoidArb'),
---       jsc.nat,
---     ]),
---   }));
+describe 'lte', ->
+	local Z
+
+	setup ->
+		Z = require 'alma.type-classes'
+
+	it 'behaves as expected', ->
+		cases = {
+			{want: true, v1: nil, v2: nil},
+
+			{want: true, v1: false, v2: false},
+			{want: true, v1: false, v2: true},
+			{want: true, v1: true, v2: true},
+			{want: false, v1: true, v2: false},
+
+			{want: true, v1: 42, v2: 42},
+			{want: true, v1: 42, v2: 43},
+			{want: false, v1: 43, v2: 42},
+			{want: true, v1: 0, v2: 0},
+			{want: true, v1: 0, v2: -0},
+			{want: true, v1: -0, v2: 0},
+			{want: true, v1: -0, v2: -0},
+			{want: true, v1: 0/0, v2: 0/0},
+			{want: true, v1: 1/0, v2: 1/0},
+			{want: false, v1: 1/0, v2: -1/0},
+			{want: true, v1: -1/0, v2: 1/0},
+			{want: true, v1: -1/0, v2: -1/0},
+			{want: true, v1: 0/0, v2: math.pi},
+			{want: false, v1: math.pi, v2: 0/0},
+
+			{want: true, v1: '', v2: ''},
+			{want: true, v1: 'abc', v2: 'abc'},
+			{want: true, v1: 'abc', v2: 'xyz'},
+			{want: false, v1: 'xyz', v2: 'abc'},
+		}
+		for _, c in ipairs(cases)
+			got = Z.lte(c.v1, c.v2)
+			assert.are.equal(c.want, got, "values: #{inspect(c.v1)}, #{inspect(c.v2)}")
+
+-- test ('lte', () => {
+--   eq (Z.lte ([], []), true);
+--   eq (Z.lte ([1, 2], [1, 2]), true);
+--   eq (Z.lte ([1, 2, 3], [1, 2]), false);
+--   eq (Z.lte ([1, 2], [1, 2, 3]), true);
+--   eq (Z.lte ([1, 2], [2]), true);
+--   eq (Z.lte ([], [undefined]), true);
+--   eq (Z.lte ([undefined], []), false);
+--   eq (Z.lte ([0], [-0]), true);
+--   eq (Z.lte ([NaN], [NaN]), true);
+--   eq (Z.lte (ones, ones), true);
+--   eq (Z.lte (ones, [1, [1, [1, [1, []]]]]), false);
+--   eq (Z.lte (ones, [1, [1, [1, [1, [0, ones]]]]]), false);
+--   eq (Z.lte (ones, [1, [1, [1, [1, [1, ones]]]]]), true);
+--   eq (Z.lte (ones, ones_), true);
+--   eq (Z.lte (ones_, ones), true);
+--   eq (Z.lte (args (), args ()), true);
+--   eq (Z.lte (args (1, 2), args (1, 2)), true);
+--   eq (Z.lte (args (1, 2, 3), args (1, 2)), false);
+--   eq (Z.lte (args (1, 2), args (1, 2, 3)), true);
+--   eq (Z.lte (args (1, 2), args (2, 1)), true);
+--   eq (Z.lte (args (0), args (-0)), true);
+--   eq (Z.lte (args (NaN), args (NaN)), true);
+--   eq (Z.lte ({}, {}), true);
+--   eq (Z.lte ({a: 0}, {z: 0}), true);
+--   eq (Z.lte ({z: 0}, {a: 0}), false);
+--   eq (Z.lte ({x: 1, y: 2}, {y: 2, x: 1}), true);
+--   eq (Z.lte ({x: 1, y: 2, z: 3}, {x: 1, y: 2}), false);
+--   eq (Z.lte ({x: 1, y: 2}, {x: 1, y: 2, z: 3}), true);
+--   eq (Z.lte ({x: 1, y: 1}, {x: 2, y: 1}), true);
+--   eq (Z.lte ({x: 2, y: 1}, {x: 1, y: 2}), false);
+--   eq (Z.lte ({x: 0, y: 0}, {x: 1}), true);
+--   eq (Z.lte ({x: 0}, {x: 0, y: 0}), true);
+--   eq (Z.lte ({x: -0}, {x: 0}), true);
+--   eq (Z.lte ({x: 0}, {x: -0}), true);
+--   eq (Z.lte ({x: NaN}, {x: NaN}), true);
+--   eq (Z.lte (Identity (Identity (Identity (0))), Identity (Identity (Identity (0)))), true);
+--   eq (Z.lte (Identity (Identity (Identity (0))), Identity (Identity (Identity (1)))), true);
+--   eq (Z.lte (Identity (Identity (Identity (1))), Identity (Identity (Identity (0)))), false);
+--   eq (Z.lte ('abc', 123), false);
 --
---   nestedSetoidArb.show = show;
---
---   eq (Z.equals (Identity (Identity (Identity (0))), Identity (Identity (Identity (0)))), true);
---   eq (Z.equals (Identity (Identity (Identity (0))), Identity (Identity (Identity (1)))), false);
---   eq (Z.equals (Array.prototype, Array.prototype), true);
---   eq (Z.equals (Nothing.constructor, Maybe), true);
---   eq (Z.equals ((Just (0)).constructor, Maybe), true);
---
---   jsc.assert (jsc.forall (nestedSetoidArb, x => Z.equals (x, x)));
+--   const $0 = {z: 0};
+--   const $1 = {z: 1};
+--   $0.a = $1;
+--   $1.a = $0;
+--   eq (Z.lte ($0, $0), true);
+--   eq (Z.lte ($0, $1), false);
+--   eq (Z.lte ($1, $0), false);
 -- });

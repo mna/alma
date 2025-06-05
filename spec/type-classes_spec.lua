@@ -446,7 +446,7 @@ describe('Category', function()
     end
   end)
 end)
-return describe('equals', function()
+describe('equals', function()
   local Z
   setup(function()
     Z = require('alma.type-classes')
@@ -755,6 +755,26 @@ return describe('equals', function()
       },
       {
         want = true,
+        v1 = Z.StrMap({ }),
+        v2 = { }
+      },
+      {
+        want = true,
+        v1 = { },
+        v2 = Z.StrMap({ })
+      },
+      {
+        want = true,
+        v1 = Z.Array({ }),
+        v2 = Z.StrMap({ })
+      },
+      {
+        want = true,
+        v1 = Z.StrMap({ }),
+        v2 = Z.Array({ })
+      },
+      {
+        want = true,
         v1 = {
           x = 1,
           y = 2
@@ -870,6 +890,135 @@ return describe('equals', function()
     }
     for _, c in ipairs(cases) do
       local got = Z.equals(c.v1, c.v2)
+      assert.are.equal(c.want, got, "values: " .. tostring(inspect(c.v1)) .. ", " .. tostring(inspect(c.v2)))
+    end
+  end)
+end)
+return describe('lte', function()
+  local Z
+  setup(function()
+    Z = require('alma.type-classes')
+  end)
+  return it('behaves as expected', function()
+    local cases = {
+      {
+        want = true,
+        v1 = nil,
+        v2 = nil
+      },
+      {
+        want = true,
+        v1 = false,
+        v2 = false
+      },
+      {
+        want = true,
+        v1 = false,
+        v2 = true
+      },
+      {
+        want = true,
+        v1 = true,
+        v2 = true
+      },
+      {
+        want = false,
+        v1 = true,
+        v2 = false
+      },
+      {
+        want = true,
+        v1 = 42,
+        v2 = 42
+      },
+      {
+        want = true,
+        v1 = 42,
+        v2 = 43
+      },
+      {
+        want = false,
+        v1 = 43,
+        v2 = 42
+      },
+      {
+        want = true,
+        v1 = 0,
+        v2 = 0
+      },
+      {
+        want = true,
+        v1 = 0,
+        v2 = -0
+      },
+      {
+        want = true,
+        v1 = -0,
+        v2 = 0
+      },
+      {
+        want = true,
+        v1 = -0,
+        v2 = -0
+      },
+      {
+        want = true,
+        v1 = 0 / 0,
+        v2 = 0 / 0
+      },
+      {
+        want = true,
+        v1 = 1 / 0,
+        v2 = 1 / 0
+      },
+      {
+        want = false,
+        v1 = 1 / 0,
+        v2 = -1 / 0
+      },
+      {
+        want = true,
+        v1 = -1 / 0,
+        v2 = 1 / 0
+      },
+      {
+        want = true,
+        v1 = -1 / 0,
+        v2 = -1 / 0
+      },
+      {
+        want = true,
+        v1 = 0 / 0,
+        v2 = math.pi
+      },
+      {
+        want = false,
+        v1 = math.pi,
+        v2 = 0 / 0
+      },
+      {
+        want = true,
+        v1 = '',
+        v2 = ''
+      },
+      {
+        want = true,
+        v1 = 'abc',
+        v2 = 'abc'
+      },
+      {
+        want = true,
+        v1 = 'abc',
+        v2 = 'xyz'
+      },
+      {
+        want = false,
+        v1 = 'xyz',
+        v2 = 'abc'
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Z.lte(c.v1, c.v2)
       assert.are.equal(c.want, got, "values: " .. tostring(inspect(c.v1)) .. ", " .. tostring(inspect(c.v2)))
     end
   end)

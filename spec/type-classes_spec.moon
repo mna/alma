@@ -197,3 +197,121 @@ describe 'Category', ->
 		for _, c in ipairs(cases)
 			got = Category.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+
+describe 'equals', ->
+	local Z
+
+	setup ->
+		Z = require 'alma.type-classes'
+
+	it 'behaves as expected', ->
+		ones = {1}
+		table.insert(ones, ones)
+		ones_ = {1}
+		table.insert(ones_, {1, ones_})
+
+		node1 = {id: 1, rels: {}}
+		node2 = {id: 2, rels: {}}
+		table.insert(node1.rels, {type: 'child', value: node2})
+		table.insert(node2.rels, {type: 'parent', value: node1})
+
+		zero = {z: 0}
+		one = {z: 1}
+		zero.a = one
+		one.a = zero
+
+		cases = {
+			{want: true, v1: nil, v2: nil},
+
+			{want: true, v1: false, v2: false},
+			{want: false, v1: false, v2: true},
+			{want: true, v1: true, v2: true},
+			{want: false, v1: true, v2: false},
+
+			{want: true, v1: 0, v2: 0},
+			{want: true, v1: 0, v2: -0},
+			{want: true, v1: -0, v2: 0},
+			{want: true, v1: -0, v2: -0},
+			{want: true, v1: 0/0, v2: 0/0}, -- NaN
+			{want: true, v1: 1/0, v2: 1/0}, -- inf
+			{want: false, v1: 1/0, v2: -1/0},
+			{want: false, v1: -1/0, v2: 1/0},
+			{want: true, v1: -1/0, v2: -1/0},
+			{want: false, v1: 0/0, v2: math.pi},
+			{want: false, v1: math.pi, v2: 0/0},
+
+			{want: true, v1: '', v2: ''},
+			{want: true, v1: 'abC', v2: 'abC'},
+			{want: false, v1: 'abC', v2: 'xyZ'},
+
+			{want: true, v1: {}, v2: {}},
+			{want: true, v1: Z.Array({}), v2: Z.Array({})},
+			{want: true, v1: {}, v2: Z.Array({})},
+			{want: true, v1: Z.Array({}), v2: {}},
+			{want: true, v1: {'a'}, v2: {'a'}},
+			{want: true, v1: {'a', 'b'}, v2: {'a', 'b'}},
+			{want: false, v1: {1, 2, 3}, v2: {1, 2}},
+			{want: false, v1: {1, 2}, v2: {1, 2, 3}},
+			{want: false, v1: {1, 2}, v2: {2, 1}},
+			{want: true, v1: {0}, v2: {-0}},
+			{want: true, v1: {0/0}, v2: {0/0}},
+			{want: true, v1: ones, v2: ones},
+			{want: false, v1: ones, v2: {1, {1, {1, {1, {}}}}}},
+			{want: false, v1: ones, v2: {1, {1, {1, {1, {0, ones}}}}}},
+			{want: true, v1: ones, v2: {1, {1, {1, {1, {1, ones}}}}}},
+			{want: true, v1: ones, v2: ones_},
+			{want: true, v1: ones_, v2: ones},
+
+			{want: true, v1: Z.StrMap({}), v2: Z.StrMap({})},
+			{want: true, v1: {x: 1, y: 2}, v2: {y: 2, x: 1}},
+			{want: false, v1: {x: 1, y: 2, z: 3}, v2: {y: 2, x: 1}},
+			{want: false, v1: {x: 1, y: 2}, v2: {z: 3, y: 2, x: 1}},
+			{want: false, v1: {x: 1, y: 2}, v2: {x: 2, y: 1}},
+			{want: true, v1: {x: 0}, v2: {x: -0}},
+			{want: true, v1: {x: 0/0}, v2: {x: 0/0}},
+			{want: true, v1: node1, v2: node1},
+			{want: true, v1: node2, v2: node2},
+			{want: false, v1: node1, v2: node2},
+			{want: false, v1: node2, v2: node1},
+			{want: true, v1: zero, v2: zero},
+			{want: false, v1: zero, v2: one},
+			{want: false, v1: one, v2: zero},
+			{want: true, v1: one, v2: one},
+
+			{want: true, v1: math.sin, v2: math.sin},
+			{want: false, v1: math.sin, v2: math.cos},
+		}
+		for _, c in ipairs(cases)
+			got = Z.equals(c.v1, c.v2)
+			assert.are.equal(c.want, got, "values: #{inspect(c.v1)}, #{inspect(c.v2)}")
+
+-- test ('equals', () => {
+--   const {nestedSetoidArb} = jsc.letrec (tie => ({
+--     builtinSetoidArb: jsc.record ({
+--       value: tie ('nestedSetoidArb'),
+--     }),
+--     customSetoidArb: jsc.record ({
+--       'value': tie ('nestedSetoidArb'),
+--       '@@type': jsc.constant ('sanctuary-type-classes/CustomSetoid@1'),
+--       '@@show': jsc.constant (function() { return `CustomSetoid (${show (this.value)})`; }),
+--       'fantasy-land/equals': jsc.constant (function(other) {
+--         return Z.equals (this.value, other.value);
+--       }),
+--     }),
+--     nestedSetoidArb: jsc.oneof ([
+--       tie ('builtinSetoidArb'),
+--       tie ('customSetoidArb'),
+--       jsc.nat,
+--     ]),
+--   }));
+--
+--   nestedSetoidArb.show = show;
+--
+--   eq (Z.equals (Identity (Identity (Identity (0))), Identity (Identity (Identity (0)))), true);
+--   eq (Z.equals (Identity (Identity (Identity (0))), Identity (Identity (Identity (1)))), false);
+--   eq (Z.equals (Array.prototype, Array.prototype), true);
+--   eq (Z.equals (Nothing.constructor, Maybe), true);
+--   eq (Z.equals ((Just (0)).constructor, Maybe), true);
+--
+--   jsc.assert (jsc.forall (nestedSetoidArb, x => Z.equals (x, x)));
+-- });

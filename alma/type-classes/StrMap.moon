@@ -61,16 +61,17 @@ sorted_keys = (o) ->
 			if not Z.equals(@[k], other[k])
 				return Z.lte(@[k], other[k])
 
+  -- StrMap.concat :: StrMap a ~> StrMap a -> StrMap a
+	M.concat = (other) =>
+		r = M.StrMap()
+		for k, v in pairs(@)
+			r[k] = v
+		for k, v in pairs(other)
+			r[k] = v
+		r
+
 	M
 
-  -- //  Object$prototype$concat :: StrMap a ~> StrMap a -> StrMap a
-  -- function Object$prototype$concat(other) {
-  --   const result = {};
-  --   (Object.keys (this)).forEach (k => { result[k] = this[k]; });
-  --   (Object.keys (other)).forEach (k => { result[k] = other[k]; });
-  --   return result;
-  -- }
-  --
   -- //  Object$prototype$filter :: StrMap a ~> (a -> Boolean) -> StrMap a
   -- function Object$prototype$filter(pred) {
   --   const result = {};

@@ -446,6 +446,92 @@ describe('Category', function()
     end
   end)
 end)
+describe('Semigroup', function()
+  local Semigroup, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Semigroup, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Semigroup, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Semigroup))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Semigroup', Semigroup.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Semigroup", Semigroup.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = false,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = true,
+        value = ''
+      },
+      {
+        want = false,
+        value = 0
+      },
+      {
+        want = false,
+        value = true
+      },
+      {
+        want = true,
+        value = { }
+      },
+      {
+        want = true,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = true,
+        value = Array()
+      },
+      {
+        want = true,
+        value = StrMap()
+      },
+      {
+        want = false,
+        value = math.abs
+      },
+      {
+        want = true,
+        value = callable
+      },
+      {
+        want = false,
+        value = Callable(callable)
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Semigroup.test(c.value)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
+    end
+  end)
+end)
 describe('equals', function()
   local Z
   setup(function()
@@ -1015,6 +1101,79 @@ return describe('lte', function()
         want = false,
         v1 = 'xyz',
         v2 = 'abc'
+      },
+      {
+        want = true,
+        v1 = { },
+        v2 = { }
+      },
+      {
+        want = true,
+        v1 = {
+          1,
+          2
+        },
+        v2 = {
+          1,
+          2
+        }
+      },
+      {
+        want = false,
+        v1 = {
+          1,
+          2,
+          3
+        },
+        v2 = {
+          1,
+          2
+        }
+      },
+      {
+        want = true,
+        v1 = {
+          1,
+          2
+        },
+        v2 = {
+          1,
+          2,
+          3
+        }
+      },
+      {
+        want = true,
+        v1 = {
+          1,
+          2
+        },
+        v2 = {
+          2
+        }
+      },
+      {
+        want = true,
+        v1 = {
+          0
+        },
+        v2 = {
+          -0
+        }
+      },
+      {
+        want = true,
+        v1 = {
+          0 / 0
+        },
+        v2 = {
+          0 / 0
+        }
+      },
+      {
+        want = true,
+        v1 = ones,
+        v2 = ones
       }
     }
     for _, c in ipairs(cases) do

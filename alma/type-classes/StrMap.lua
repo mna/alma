@@ -67,5 +67,15 @@ return function(Z)
       end
     end
   end
+  M.concat = function(self, other)
+    local r = M.StrMap()
+    for k, v in pairs(self) do
+      r[k] = v
+    end
+    for k, v in pairs(other) do
+      r[k] = v
+    end
+    return r
+  end
   return M
 end

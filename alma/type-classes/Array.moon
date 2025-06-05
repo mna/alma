@@ -58,6 +58,15 @@ local M
 				return Z.lte(@[i], other[i])
 		true
 
+	-- Array.concat :: Array a ~> Array a -> Array a
+	M.concat = (other) =>
+		r = M.Array()
+		for _, v in ipairs(@)
+			table.insert(r, v)
+		for _, v in ipairs(other)
+			table.insert(r, v)
+		r
+
 	M
 		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
 		-- const Array$chainRec = (f, x) => {
@@ -83,11 +92,6 @@ local M
 		--   }
 		--   return result;
 		-- };
-		--
-		-- //  Array$prototype$concat :: Array a ~> Array a -> Array a
-		-- function Array$prototype$concat(other) {
-		--   return this.concat (other);
-		-- }
 		--
 		-- //  Array$prototype$filter :: Array a ~> (a -> Boolean) -> Array a
 		-- function Array$prototype$filter(pred) {

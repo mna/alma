@@ -301,6 +301,18 @@ M.Category = TypeClass__factory('Category', {
     }
   }
 })
+M.Semigroup = TypeClass__factory('Semigroup', { }, {
+  {
+    name = 'concat',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.concat,
+      String = String.concat,
+      StrMap = StrMap.concat
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -339,6 +351,17 @@ do
       error(err_or_result)
     end
     return err_or_result
+  end
+end
+do
+  M.compose = M.Semigroupoid.methods.compose
+end
+do
+  M.id = M.Category.methods.id
+end
+do
+  M.concat = function(a, b)
+    return Z.Semigroup.methods.concat(b, a)
   end
 end
 return M

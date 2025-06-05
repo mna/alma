@@ -198,6 +198,43 @@ describe 'Category', ->
 			got = Category.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
 
+describe 'Semigroup', ->
+	local Semigroup, Array, Callable, StrMap, identifier_of
+
+	setup ->
+		{:Array, :Callable, :Semigroup, :StrMap} = require 'alma.type-classes'
+		{:identifier_of} = require 'alma.type-identifiers'
+
+	it 'is a TypeClass', ->
+		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Semigroup))
+
+	it 'has the expected name', ->
+		assert.are.equal('alma.type-classes/Semigroup', Semigroup.name)
+
+	it 'has the expected url', ->
+		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Semigroup", Semigroup.url)
+
+	it 'accepts expected values', ->
+		callable = setmetatable({}, {__call: -> true})
+		cases = {
+			{want: false, value: nil},
+			{want: false, value: io.stdout},
+			{want: false, value: coroutine.create(->)},
+			{want: true, value: ''},
+			{want: false, value: 0},
+			{want: false, value: true},
+			{want: true, value: {}},
+			{want: true, value: {a:1}},
+			{want: true, value: Array()},
+			{want: true, value: StrMap()},
+			{want: false, value: math.abs},
+			{want: true, value: callable},
+			{want: false, value: Callable(callable)},
+		}
+		for _, c in ipairs(cases)
+			got = Semigroup.test(c.value)
+			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+
 describe 'equals', ->
 	local Z
 
@@ -264,9 +301,9 @@ describe 'equals', ->
 
 			{want: true, v1: Z.StrMap({}), v2: Z.StrMap({})},
 			{want: true, v1: Z.StrMap({}), v2: {}}, -- empty array and empty object are undistinguishable
-			{want: true, v1: {}, v2: Z.StrMap({})}, 
-			{want: true, v1: Z.Array({}), v2: Z.StrMap({})}, 
-			{want: true, v1: Z.StrMap({}), v2: Z.Array({})}, 
+			{want: true, v1: {}, v2: Z.StrMap({})},
+			{want: true, v1: Z.Array({}), v2: Z.StrMap({})},
+			{want: true, v1: Z.StrMap({}), v2: Z.Array({})},
 			{want: true, v1: {x: 1, y: 2}, v2: {y: 2, x: 1}},
 			{want: false, v1: {x: 1, y: 2, z: 3}, v2: {y: 2, x: 1}},
 			{want: false, v1: {x: 1, y: 2}, v2: {z: 3, y: 2, x: 1}},
@@ -326,34 +363,26 @@ describe 'lte', ->
 			{want: true, v1: 'abc', v2: 'abc'},
 			{want: true, v1: 'abc', v2: 'xyz'},
 			{want: false, v1: 'xyz', v2: 'abc'},
+
+			{want: true, v1: {}, v2: {}},
+			{want: true, v1: {1, 2}, v2: {1, 2}},
+			{want: false, v1: {1, 2, 3}, v2: {1, 2}},
+			{want: true, v1: {1, 2}, v2: {1, 2, 3}},
+			{want: true, v1: {1, 2}, v2: {2}},
+			{want: true, v1: {0}, v2: {-0}},
+			{want: true, v1: {0/0}, v2: {0/0}},
+			{want: true, v1: ones, v2: ones},
 		}
 		for _, c in ipairs(cases)
 			got = Z.lte(c.v1, c.v2)
 			assert.are.equal(c.want, got, "values: #{inspect(c.v1)}, #{inspect(c.v2)}")
 
 -- test ('lte', () => {
---   eq (Z.lte ([], []), true);
---   eq (Z.lte ([1, 2], [1, 2]), true);
---   eq (Z.lte ([1, 2, 3], [1, 2]), false);
---   eq (Z.lte ([1, 2], [1, 2, 3]), true);
---   eq (Z.lte ([1, 2], [2]), true);
---   eq (Z.lte ([], [undefined]), true);
---   eq (Z.lte ([undefined], []), false);
---   eq (Z.lte ([0], [-0]), true);
---   eq (Z.lte ([NaN], [NaN]), true);
---   eq (Z.lte (ones, ones), true);
 --   eq (Z.lte (ones, [1, [1, [1, [1, []]]]]), false);
 --   eq (Z.lte (ones, [1, [1, [1, [1, [0, ones]]]]]), false);
 --   eq (Z.lte (ones, [1, [1, [1, [1, [1, ones]]]]]), true);
 --   eq (Z.lte (ones, ones_), true);
 --   eq (Z.lte (ones_, ones), true);
---   eq (Z.lte (args (), args ()), true);
---   eq (Z.lte (args (1, 2), args (1, 2)), true);
---   eq (Z.lte (args (1, 2, 3), args (1, 2)), false);
---   eq (Z.lte (args (1, 2), args (1, 2, 3)), true);
---   eq (Z.lte (args (1, 2), args (2, 1)), true);
---   eq (Z.lte (args (0), args (-0)), true);
---   eq (Z.lte (args (NaN), args (NaN)), true);
 --   eq (Z.lte ({}, {}), true);
 --   eq (Z.lte ({a: 0}, {z: 0}), true);
 --   eq (Z.lte ({z: 0}, {a: 0}), false);

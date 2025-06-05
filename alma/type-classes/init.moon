@@ -272,6 +272,19 @@ M.Category = TypeClass__factory('Category', {M.Semigroupoid}, {
 	},
 })
 
+M.Semigroup = TypeClass__factory('Semigroup', {}, {
+	{
+		name: 'concat',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.concat,
+			String: String.concat,
+			StrMap: StrMap.concat,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -307,5 +320,14 @@ do
 		table.remove(pairs)
 		error(err_or_result) unless ok
 		err_or_result
+
+do
+	M.compose = M.Semigroupoid.methods.compose
+
+do
+	M.id = M.Category.methods.id
+
+do
+	M.concat = (a, b) -> Z.Semigroup.methods.concat(b, a)
 
 M

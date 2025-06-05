@@ -25,7 +25,7 @@ return describe('Useless', function()
   end)
   it('shows as expected', function()
     local s = show(Useless)
-    return assert.are.equal(s, 'Useless!')
+    return assert.are.equal(s, 'Useless')
   end)
   return it('satisfies no type class', function()
     local cases = {

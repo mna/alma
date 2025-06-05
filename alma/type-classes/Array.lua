@@ -71,5 +71,15 @@ return function(Z)
     end
     return true
   end
+  M.concat = function(self, other)
+    local r = M.Array()
+    for _, v in ipairs(self) do
+      table.insert(r, v)
+    end
+    for _, v in ipairs(other) do
+      table.insert(r, v)
+    end
+    return r
+  end
   return M
 end

@@ -2,13 +2,14 @@ local assert = require('luassert')
 local inspect = require('inspect')
 local _ = inspect
 return describe('Useless', function()
-  local Useless, identifier_of, parse_identifier, Z
+  local Useless, identifier_of, parse_identifier, show, Z
   setup(function()
     Useless = require('alma.useless').Useless
     do
       local _obj_0 = require('alma.type-identifiers')
       identifier_of, parse_identifier = _obj_0.identifier_of, _obj_0.parse_identifier
     end
+    show = require('alma.show').show
     Z = require('alma.type-classes')
   end)
   it('is of the expected type', function()
@@ -21,6 +22,10 @@ return describe('Useless', function()
       name = 'Useless',
       version = 1
     }, tp)
+  end)
+  it('shows as expected', function()
+    local s = show(Useless)
+    return assert.are.equal(s, 'Useless!')
   end)
   return it('satisfies no type class', function()
     local cases = {

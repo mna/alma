@@ -3,11 +3,12 @@ inspect = require 'inspect'
 _ = inspect -- don't complain if unused
 
 describe 'Useless', ->
-	local Useless, identifier_of, parse_identifier, Z
+	local Useless, identifier_of, parse_identifier, show, Z
 
 	setup ->
 		{:Useless} = require 'alma.useless'
 		{:identifier_of, :parse_identifier} = require 'alma.type-identifiers'
+		{:show} = require 'alma.show'
 		Z = require 'alma.type-classes'
 
 	it 'is of the expected type', ->
@@ -17,12 +18,17 @@ describe 'Useless', ->
 		tp = parse_identifier(identifier_of(Useless))
 		assert.are.same({namespace: 'alma.useless', name: 'Useless', version: 1}, tp)
 
+	it 'shows as expected', ->
+		s = show(Useless)
+		assert.are.equal(s, 'Useless')
+
 	it 'satisfies no type class', ->
 		cases = {
 			Z.Setoid,
 			Z.Ord,
 			Z.Semigroupoid,
 			Z.Category,
+			-- TODO: add other type classes once implemented
 		}
 		for _, tc in ipairs(cases)
 			assert.is_false(tc.test(Useless), 'typeclass: ' .. tc.name)

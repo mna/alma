@@ -285,6 +285,19 @@ M.Semigroup = TypeClass__factory('Semigroup', {}, {
 	},
 })
 
+M.Monoid = TypeClass__factory('Monoid', {M.Semigroup}, {
+	{
+		name: 'empty',
+		location: Constructor,
+		arity: 0,
+		implementations: {
+			Array: Array.empty,
+			String: String.empty,
+			StrMap: StrMap.empty,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -329,5 +342,8 @@ do
 
 do
 	M.concat = (a, b) -> Z.Semigroup.methods.concat(b, a)
+
+do
+	M.empty = M.Monoid.methods.empty
 
 M

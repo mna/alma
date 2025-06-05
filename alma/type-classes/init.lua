@@ -313,6 +313,20 @@ M.Semigroup = TypeClass__factory('Semigroup', { }, {
     }
   }
 })
+M.Monoid = TypeClass__factory('Monoid', {
+  M.Semigroup
+}, {
+  {
+    name = 'empty',
+    location = Constructor,
+    arity = 0,
+    implementations = {
+      Array = Array.empty,
+      String = String.empty,
+      StrMap = StrMap.empty
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -363,5 +377,8 @@ do
   M.concat = function(a, b)
     return Z.Semigroup.methods.concat(b, a)
   end
+end
+do
+  M.empty = M.Monoid.methods.empty
 end
 return M

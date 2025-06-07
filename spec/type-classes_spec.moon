@@ -3,6 +3,17 @@ inspect = require 'inspect'
 _ = inspect -- don't complain if unused
 math = require 'math'
 
+ones = {1}
+table.insert(ones, ones)
+ones_ = {1}
+table.insert(ones_, {1, ones_})
+
+zero = {z: 0}
+one = {z: 1}
+zero.a = one
+one.a = zero
+
+
 describe 'TypeClass', ->
 	local TypeClass, identifier_of
 
@@ -279,20 +290,10 @@ describe 'equals', ->
 		Z = require 'alma.type-classes'
 
 	it 'behaves as expected', ->
-		ones = {1}
-		table.insert(ones, ones)
-		ones_ = {1}
-		table.insert(ones_, {1, ones_})
-
 		node1 = {id: 1, rels: {}}
 		node2 = {id: 2, rels: {}}
 		table.insert(node1.rels, {type: 'child', value: node2})
 		table.insert(node2.rels, {type: 'parent', value: node1})
-
-		zero = {z: 0}
-		one = {z: 1}
-		zero.a = one
-		one.a = zero
 
 		cases = {
 			{want: true, v1: nil, v2: nil},
@@ -409,40 +410,39 @@ describe 'lte', ->
 			{want: true, v1: {0}, v2: {-0}},
 			{want: true, v1: {0/0}, v2: {0/0}},
 			{want: true, v1: ones, v2: ones},
+
+			{want: false, v1: ones, v2: {1, {1, {1, {1, {}}}}}},
+			{want: false, v1: ones, v2: {1, {1, {1, {0, ones}}}}},
+			{want: true, v1: ones, v2: {1, {1, {1, {1, ones}}}}},
+			{want: true, v1: ones, v2: ones_},
+			{want: true, v1: ones_, v2: ones},
+
+			{want: true, v1: Z.StrMap({}), v2: Z.StrMap({})},
+			{want: true, v1: Z.StrMap({}), v2: {}}, -- empty array and empty object are undistinguishable
+			{want: true, v1: {}, v2: Z.StrMap({})},
+			{want: true, v1: Z.Array({}), v2: Z.StrMap({})},
+			{want: true, v1: Z.StrMap({}), v2: Z.Array({})},
+			{want: true, v1: {a: 0}, v2: {z: 0}},
+			{want: false, v1: {z: 0}, v2: {a: 0}},
+			{want: true, v1: {x: 1, y: 2}, v2: {y: 2, x: 1}},
+			{want: false, v1: {x: 1, y: 2, z: 3}, v2: {y: 2, x: 1}},
+			{want: true, v1: {x: 1, y: 2}, v2: {z: 3, y: 2, x: 1}},
+			{want: true, v1: {x: 1, y: 1}, v2: {y: 1, x: 2}},
+			{want: false, v1: {x: 2, y: 1}, v2: {y: 2, x: 1}},
+			{want: true, v1: {x: 0, y: 0}, v2: {x: 1}},
+			{want: true, v1: {x: 0}, v2: {x: 0, y: 0}},
+			{want: false, v1: {x: 0, y: 0}, v2: {x: 0}},
+			{want: true, v1: {x: -0}, v2: {x: 0}},
+			{want: true, v1: {x: 0}, v2: {x: -0}},
+			{want: true, v1: {x: 0/0}, v2: {x: 0/0}},
+
+			{want: true, v1: zero, v2: zero},
+			{want: false, v1: zero, v2: one},
+			{want: false, v1: one, v2: zero},
+
+			-- TODO: add cases for Maybe, Identity, other custom types
+			-- TODO: add property based testing?
 		}
 		for _, c in ipairs(cases)
 			got = Z.lte(c.v1, c.v2)
 			assert.are.equal(c.want, got, "values: #{inspect(c.v1)}, #{inspect(c.v2)}")
-
--- test ('lte', () => {
---   eq (Z.lte (ones, [1, [1, [1, [1, []]]]]), false);
---   eq (Z.lte (ones, [1, [1, [1, [1, [0, ones]]]]]), false);
---   eq (Z.lte (ones, [1, [1, [1, [1, [1, ones]]]]]), true);
---   eq (Z.lte (ones, ones_), true);
---   eq (Z.lte (ones_, ones), true);
---   eq (Z.lte ({}, {}), true);
---   eq (Z.lte ({a: 0}, {z: 0}), true);
---   eq (Z.lte ({z: 0}, {a: 0}), false);
---   eq (Z.lte ({x: 1, y: 2}, {y: 2, x: 1}), true);
---   eq (Z.lte ({x: 1, y: 2, z: 3}, {x: 1, y: 2}), false);
---   eq (Z.lte ({x: 1, y: 2}, {x: 1, y: 2, z: 3}), true);
---   eq (Z.lte ({x: 1, y: 1}, {x: 2, y: 1}), true);
---   eq (Z.lte ({x: 2, y: 1}, {x: 1, y: 2}), false);
---   eq (Z.lte ({x: 0, y: 0}, {x: 1}), true);
---   eq (Z.lte ({x: 0}, {x: 0, y: 0}), true);
---   eq (Z.lte ({x: -0}, {x: 0}), true);
---   eq (Z.lte ({x: 0}, {x: -0}), true);
---   eq (Z.lte ({x: NaN}, {x: NaN}), true);
---   eq (Z.lte (Identity (Identity (Identity (0))), Identity (Identity (Identity (0)))), true);
---   eq (Z.lte (Identity (Identity (Identity (0))), Identity (Identity (Identity (1)))), true);
---   eq (Z.lte (Identity (Identity (Identity (1))), Identity (Identity (Identity (0)))), false);
---   eq (Z.lte ('abc', 123), false);
---
---   const $0 = {z: 0};
---   const $1 = {z: 1};
---   $0.a = $1;
---   $1.a = $0;
---   eq (Z.lte ($0, $0), true);
---   eq (Z.lte ($0, $1), false);
---   eq (Z.lte ($1, $0), false);
--- });

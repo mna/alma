@@ -405,4 +405,7 @@ end
 do
   M.invert = M.Group.methods.invert
 end
+do
+  M.filter = M.Filterable.methods.filter
+end
 return M

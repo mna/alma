@@ -370,4 +370,7 @@ do
 do
 	M.invert = M.Group.methods.invert
 
+do
+	M.filter = M.Filterable.methods.filter
+
 M

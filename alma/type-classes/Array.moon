@@ -23,6 +23,7 @@ local M
 			return true if p(v)
 		false
 
+	-- Array.filter :: Array a ~> (a -> Boolean) -> Array a
 	M.filter = (a, p) ->
 		r = M.Array()
 		for _, v in ipairs(a)
@@ -92,11 +93,6 @@ local M
 		--   }
 		--   return result;
 		-- };
-		--
-		-- //  Array$prototype$filter :: Array a ~> (a -> Boolean) -> Array a
-		-- function Array$prototype$filter(pred) {
-		--   return this.filter (x => pred (x));
-		-- }
 		--
 		-- //  Array$prototype$map :: Array a ~> (a -> b) -> Array b
 		-- function Array$prototype$map(f) {

@@ -70,17 +70,15 @@ sorted_keys = (o) ->
 			r[k] = v
 		r
 
+  -- StrMap.filter :: StrMap a ~> (a -> Boolean) -> StrMap a
+	M.filter = (o, pred) ->
+		r = M.StrMap()
+		for k, v in pairs(o)
+			r[k] = v if pred(v)
+		r
+
 	M
 
-  -- //  Object$prototype$filter :: StrMap a ~> (a -> Boolean) -> StrMap a
-  -- function Object$prototype$filter(pred) {
-  --   const result = {};
-  --   (Object.keys (this)).forEach (k => {
-  --     if (pred (this[k])) result[k] = this[k];
-  --   });
-  --   return result;
-  -- }
-  --
   -- //  Object$prototype$map :: StrMap a ~> (a -> b) -> StrMap b
   -- function Object$prototype$map(f) {
   --   const result = {};

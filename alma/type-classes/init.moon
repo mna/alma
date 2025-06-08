@@ -307,6 +307,18 @@ M.Group = TypeClass__factory('Group', {M.Monoid}, {
 	},
 })
 
+M.Filterable = TypeClass__factory('Filterable', {}, {
+	{
+		name: 'filter',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.filter,
+			StrMap: StrMap.filter,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------

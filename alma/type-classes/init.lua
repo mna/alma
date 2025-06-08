@@ -337,6 +337,17 @@ M.Group = TypeClass__factory('Group', {
     implementations = { }
   }
 })
+M.Filterable = TypeClass__factory('Filterable', { }, {
+  {
+    name = 'filter',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.filter,
+      StrMap = StrMap.filter
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)

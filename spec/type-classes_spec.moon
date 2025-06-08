@@ -322,6 +322,43 @@ describe 'Group', ->
 			got = Group.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
 
+describe 'Filterable', ->
+	local Filterable, Array, Callable, StrMap, identifier_of
+
+	setup ->
+		{:Array, :Callable, :Filterable, :StrMap} = require 'alma.type-classes'
+		{:identifier_of} = require 'alma.type-identifiers'
+
+	it 'is a TypeClass', ->
+		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Filterable))
+
+	it 'has the expected name', ->
+		assert.are.equal('alma.type-classes/Filterable', Filterable.name)
+
+	it 'has the expected url', ->
+		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Filterable", Filterable.url)
+
+	it 'accepts expected values', ->
+		callable = setmetatable({}, {__call: -> true})
+		cases = {
+			{want: false, value: nil},
+			{want: false, value: io.stdout},
+			{want: false, value: coroutine.create(->)},
+			{want: false, value: ''},
+			{want: false, value: 0},
+			{want: false, value: true},
+			{want: true, value: {}},
+			{want: true, value: {a:1}},
+			{want: true, value: Array()},
+			{want: true, value: StrMap()},
+			{want: false, value: math.abs},
+			{want: true, value: callable},
+			{want: false, value: Callable(callable)},
+		}
+		for _, c in ipairs(cases)
+			got = Filterable.test(c.value)
+			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+
 describe 'equals', ->
 	local Z
 

@@ -77,5 +77,14 @@ return function(Z)
     end
     return r
   end
+  M.filter = function(o, pred)
+    local r = M.StrMap()
+    for k, v in pairs(o) do
+      if pred(v) then
+        r[k] = v
+      end
+    end
+    return r
+  end
   return M
 end

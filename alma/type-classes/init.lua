@@ -327,6 +327,16 @@ M.Monoid = TypeClass__factory('Monoid', {
     }
   }
 })
+M.Group = TypeClass__factory('Group', {
+  M.Monoid
+}, {
+  {
+    name = 'invert',
+    location = Value,
+    arity = 0,
+    implementations = { }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -375,10 +385,13 @@ do
 end
 do
   M.concat = function(a, b)
-    return Z.Semigroup.methods.concat(b, a)
+    return M.Semigroup.methods.concat(b, a)
   end
 end
 do
   M.empty = M.Monoid.methods.empty
+end
+do
+  M.invert = M.Group.methods.invert
 end
 return M

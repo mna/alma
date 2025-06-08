@@ -298,6 +298,15 @@ M.Monoid = TypeClass__factory('Monoid', {M.Semigroup}, {
 	},
 })
 
+M.Group = TypeClass__factory('Group', {M.Monoid}, {
+	{
+		name: 'invert',
+		location: Value,
+		arity: 0,
+		implementations: {},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -341,9 +350,12 @@ do
 	M.id = M.Category.methods.id
 
 do
-	M.concat = (a, b) -> Z.Semigroup.methods.concat(b, a)
+	M.concat = (a, b) -> M.Semigroup.methods.concat(b, a)
 
 do
 	M.empty = M.Monoid.methods.empty
+
+do
+	M.invert = M.Group.methods.invert
 
 M

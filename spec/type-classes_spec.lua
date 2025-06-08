@@ -637,6 +637,92 @@ describe('Monoid', function()
     end
   end)
 end)
+describe('Group', function()
+  local Group, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Group, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Group, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Group))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Group', Group.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Group", Group.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = false,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = false,
+        value = ''
+      },
+      {
+        want = false,
+        value = 0
+      },
+      {
+        want = false,
+        value = true
+      },
+      {
+        want = false,
+        value = { }
+      },
+      {
+        want = false,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = false,
+        value = Array()
+      },
+      {
+        want = false,
+        value = StrMap()
+      },
+      {
+        want = false,
+        value = math.abs
+      },
+      {
+        want = false,
+        value = callable
+      },
+      {
+        want = false,
+        value = Callable(callable)
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Group.test(c.value)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
+    end
+  end)
+end)
 describe('equals', function()
   local Z
   setup(function()

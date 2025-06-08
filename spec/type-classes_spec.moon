@@ -283,6 +283,45 @@ describe 'Monoid', ->
 			got = Monoid.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
 
+describe 'Group', ->
+	local Group, Array, Callable, StrMap, identifier_of
+
+	setup ->
+		{:Array, :Callable, :Group, :StrMap} = require 'alma.type-classes'
+		{:identifier_of} = require 'alma.type-identifiers'
+
+	it 'is a TypeClass', ->
+		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Group))
+
+	it 'has the expected name', ->
+		assert.are.equal('alma.type-classes/Group', Group.name)
+
+	it 'has the expected url', ->
+		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Group", Group.url)
+
+	it 'accepts expected values', ->
+		callable = setmetatable({}, {__call: -> true})
+		cases = {
+			{want: false, value: nil},
+			{want: false, value: io.stdout},
+			{want: false, value: coroutine.create(->)},
+			{want: false, value: ''},
+			{want: false, value: 0},
+			{want: false, value: true},
+			{want: false, value: {}},
+			{want: false, value: {a:1}},
+			{want: false, value: Array()},
+			{want: false, value: StrMap()},
+			{want: false, value: math.abs},
+			{want: false, value: callable},
+			{want: false, value: Callable(callable)},
+
+			-- TODO: implement a custom type that satisfies Group (Sum in sanctuary)
+		}
+		for _, c in ipairs(cases)
+			got = Group.test(c.value)
+			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+
 describe 'equals', ->
 	local Z
 

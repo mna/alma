@@ -81,5 +81,12 @@ return function(Z)
     end
     return r
   end
+  M.map = function(f)
+    local r = M.Array()
+    for _, v in ipairs(self) do
+      table.insert(r, (f(v)))
+    end
+    return r
+  end
   return M
 end

@@ -809,6 +809,92 @@ describe('Filterable', function()
     end
   end)
 end)
+describe('Functor', function()
+  local Functor, Array, Callable, StrMap, identifier_of
+  setup(function()
+    do
+      local _obj_0 = require('alma.type-classes')
+      Array, Callable, Functor, StrMap = _obj_0.Array, _obj_0.Callable, _obj_0.Functor, _obj_0.StrMap
+    end
+    identifier_of = require('alma.type-identifiers').identifier_of
+  end)
+  it('is a TypeClass', function()
+    return assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Functor))
+  end)
+  it('has the expected name', function()
+    return assert.are.equal('alma.type-classes/Functor', Functor.name)
+  end)
+  it('has the expected url', function()
+    return assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Functor", Functor.url)
+  end)
+  return it('accepts expected values', function()
+    local callable = setmetatable({ }, {
+      __call = function()
+        return true
+      end
+    })
+    local cases = {
+      {
+        want = false,
+        value = nil
+      },
+      {
+        want = false,
+        value = io.stdout
+      },
+      {
+        want = false,
+        value = coroutine.create(function() end)
+      },
+      {
+        want = false,
+        value = ''
+      },
+      {
+        want = false,
+        value = 0
+      },
+      {
+        want = false,
+        value = true
+      },
+      {
+        want = true,
+        value = { }
+      },
+      {
+        want = true,
+        value = {
+          a = 1
+        }
+      },
+      {
+        want = true,
+        value = Array()
+      },
+      {
+        want = true,
+        value = StrMap()
+      },
+      {
+        want = true,
+        value = math.abs
+      },
+      {
+        want = true,
+        value = callable
+      },
+      {
+        want = true,
+        value = Callable(callable)
+      }
+    }
+    for _, c in ipairs(cases) do
+      local got = Functor.test(c.value)
+      assert.are.equal(c.want, got, "tested value: " .. tostring(inspect(c.value)))
+    end
+  end)
+end)
 describe('equals', function()
   local Z
   setup(function()

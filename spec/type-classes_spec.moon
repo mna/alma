@@ -359,6 +359,43 @@ describe 'Filterable', ->
 			got = Filterable.test(c.value)
 			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
 
+describe 'Functor', ->
+	local Functor, Array, Callable, StrMap, identifier_of
+
+	setup ->
+		{:Array, :Callable, :Functor, :StrMap} = require 'alma.type-classes'
+		{:identifier_of} = require 'alma.type-identifiers'
+
+	it 'is a TypeClass', ->
+		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Functor))
+
+	it 'has the expected name', ->
+		assert.are.equal('alma.type-classes/Functor', Functor.name)
+
+	it 'has the expected url', ->
+		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Functor", Functor.url)
+
+	it 'accepts expected values', ->
+		callable = setmetatable({}, {__call: -> true})
+		cases = {
+			{want: false, value: nil},
+			{want: false, value: io.stdout},
+			{want: false, value: coroutine.create(->)},
+			{want: false, value: ''},
+			{want: false, value: 0},
+			{want: false, value: true},
+			{want: true, value: {}},
+			{want: true, value: {a:1}},
+			{want: true, value: Array()},
+			{want: true, value: StrMap()},
+			{want: true, value: math.abs},
+			{want: true, value: callable},
+			{want: true, value: Callable(callable)},
+		}
+		for _, c in ipairs(cases)
+			got = Functor.test(c.value)
+			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+
 describe 'equals', ->
 	local Z
 

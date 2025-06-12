@@ -86,5 +86,12 @@ return function(Z)
     end
     return r
   end
+  M.map = function(f)
+    local r = M.StrMap()
+    for k, v in pairs(self) do
+      r[k] = f(v)
+    end
+    return r
+  end
   return M
 end

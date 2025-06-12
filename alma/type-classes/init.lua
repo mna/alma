@@ -348,6 +348,18 @@ M.Filterable = TypeClass__factory('Filterable', { }, {
     }
   }
 })
+M.Functor = TypeClass__factory('Functor', { }, {
+  {
+    name = 'map',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.map,
+      Function = Function.map,
+      StrMap = StrMap.map
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -407,5 +419,8 @@ do
 end
 do
   M.filter = M.Filterable.methods.filter
+end
+do
+  M.map = M.Functor.methods.map
 end
 return M

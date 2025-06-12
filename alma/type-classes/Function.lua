@@ -18,5 +18,10 @@ return function(Z)
   M.equals = function(self, other)
     return other == self
   end
+  M.map = function(f)
+    return function(x)
+      return f(self(x))
+    end
+  end
   return M
 end

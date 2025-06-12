@@ -68,7 +68,15 @@ local M
 			table.insert(r, v)
 		r
 
+	-- Array.map :: Array a ~> (a -> b) -> Array b
+	M.map = (f) ->
+		r = M.Array()
+		for _, v in ipairs(@)
+			table.insert(r, (f(v)))
+		r
+
 	M
+
 		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
 		-- const Array$chainRec = (f, x) => {
 		--   const result = [];
@@ -93,11 +101,6 @@ local M
 		--   }
 		--   return result;
 		-- };
-		--
-		-- //  Array$prototype$map :: Array a ~> (a -> b) -> Array b
-		-- function Array$prototype$map(f) {
-		--   return this.map (x => f (x));
-		-- }
 		--
 		-- //  Array$prototype$ap :: Array a ~> Array (a -> b) -> Array b
 		-- function Array$prototype$ap(fs) {

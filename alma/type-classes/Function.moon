@@ -20,4 +20,8 @@ local M
   -- Function.equals :: Function ~> Function -> Boolean
 	M.equals = (other) => other == @
 
+  -- Function.map :: (a -> b) ~> (b -> c) -> (a -> c)
+	M.map = (f) ->
+		(x) -> f(@(x))
+
 	M

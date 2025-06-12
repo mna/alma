@@ -319,6 +319,19 @@ M.Filterable = TypeClass__factory('Filterable', {}, {
 	},
 })
 
+M.Functor = TypeClass__factory('Functor', {}, {
+	{
+		name: 'map',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.map,
+			Function: Function.map,
+			StrMap: StrMap.map,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -372,5 +385,8 @@ do
 
 do
 	M.filter = M.Filterable.methods.filter
+
+do
+	M.map = M.Functor.methods.map
 
 M

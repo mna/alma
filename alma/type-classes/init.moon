@@ -332,6 +332,15 @@ M.Functor = TypeClass__factory('Functor', {}, {
 	},
 })
 
+M.Bifunctor = TypeClass__factory('Bifunctor', {M.Functor}, {
+	{
+		name: 'bimap',
+		location: Value,
+		arity: 2,
+		implementations: {},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -388,5 +397,8 @@ do
 
 do
 	M.map = M.Functor.methods.map
+
+do
+	M.bimap = M.Bifunctor.methods.bimap
 
 M

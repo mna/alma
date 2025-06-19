@@ -360,6 +360,16 @@ M.Functor = TypeClass__factory('Functor', { }, {
     }
   }
 })
+M.Bifunctor = TypeClass__factory('Bifunctor', {
+  M.Functor
+}, {
+  {
+    name = 'bimap',
+    location = Value,
+    arity = 2,
+    implementations = { }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -422,5 +432,8 @@ do
 end
 do
   M.map = M.Functor.methods.map
+end
+do
+  M.bimap = M.Bifunctor.methods.bimap
 end
 return M

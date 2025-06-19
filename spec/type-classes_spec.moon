@@ -1,7 +1,12 @@
-assert = require 'luassert'
 inspect = require 'inspect'
 _ = inspect -- don't complain if unused
 math = require 'math'
+
+{:spec_for} = require 'spec.helpers.type_class'
+{:Array, :Callable, :StrMap} = require 'alma.type-classes'
+{:Useless} = require 'alma.useless'
+
+callable = setmetatable({}, {__call: -> true})
 
 ones = {1}
 table.insert(ones, ones)
@@ -12,7 +17,6 @@ zero = {z: 0}
 one = {z: 1}
 zero.a = one
 one.a = zero
-
 
 describe 'TypeClass', ->
 	local TypeClass, identifier_of
@@ -53,348 +57,158 @@ describe 'TypeClass', ->
 		assert.is_true(Bar.test({foo: ->, bar: ->}))
 		assert.is_false(Bar.test({foo: ->, bar: 'not a func'}))
 
-describe 'Setoid', ->
-	local Setoid, Array, Callable, StrMap, identifier_of, Useless
+spec_for('Setoid', {
+		{want: true, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: true, value: ''},
+		{want: true, value: 0},
+		{want: true, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: true, value: math.abs},
+		{want: true, value: callable}, -- is an empty table
+		{want: true, value: Callable(callable)},
+		{want: true, value: {->}},
+		{want: true, value: {a:->}},
+		{want: false, value: Useless},
+		{want: false, value: {Useless}},
+		{want: false, value: {foo: Useless}},
+	})
 
-	setup ->
-		{:Array, :Callable, :Setoid, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-		{:Useless} = require 'alma.useless'
+spec_for('Ord', {
+		{want: true, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: true, value: ''},
+		{want: true, value: 0},
+		{want: true, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: true, value: callable}, -- is an empty table
+		{want: false, value: Callable(callable)},
+		{want: false, value: {->}},
+		{want: false, value: {a:->}},
+	})
 
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Setoid))
+spec_for('Semigroupoid', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: false, value: {}},
+		{want: false, value: {a:1}},
+		{want: false, value: Array()},
+		{want: false, value: StrMap()},
+		{want: true, value: math.abs},
+		{want: false, value: callable},
+		{want: true, value: Callable(callable)},
+	})
 
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Setoid', Setoid.name)
+spec_for('Category', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: false, value: {}},
+		{want: false, value: {a:1}},
+		{want: false, value: Array()},
+		{want: false, value: StrMap()},
+		{want: true, value: math.abs},
+		{want: false, value: callable},
+		{want: true, value: Callable(callable)},
+	})
 
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Setoid", Setoid.url)
+spec_for('Semigroup', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: true, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: true, value: callable},
+		{want: false, value: Callable(callable)},
+	})
 
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: true, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: true, value: ''},
-			{want: true, value: 0},
-			{want: true, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: true, value: math.abs},
-			{want: true, value: callable}, -- is an empty table
-			{want: true, value: Callable(callable)},
-			{want: true, value: {->}},
-			{want: true, value: {a:->}},
-			{want: false, value: Useless},
-			{want: false, value: {Useless}},
-			{want: false, value: {foo: Useless}},
-		}
-		for _, c in ipairs(cases)
-			got = Setoid.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+spec_for('Monoid', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: true, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: true, value: callable},
+		{want: false, value: Callable(callable)},
+	})
 
-describe 'Ord', ->
-	local Ord, Array, Callable, StrMap, identifier_of
+spec_for('Group', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: false, value: {}},
+		{want: false, value: {a:1}},
+		{want: false, value: Array()},
+		{want: false, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: false, value: callable},
+		{want: false, value: Callable(callable)},
 
-	setup ->
-		{:Array, :Callable, :Ord, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
+		-- TODO: implement a custom type that satisfies Group (Sum in sanctuary)
+	})
 
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Ord))
+spec_for('Filterable', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: true, value: callable},
+		{want: false, value: Callable(callable)},
+	})
 
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Ord', Ord.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Ord", Ord.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: true, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: true, value: ''},
-			{want: true, value: 0},
-			{want: true, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: false, value: math.abs},
-			{want: true, value: callable}, -- is an empty table
-			{want: false, value: Callable(callable)},
-			{want: false, value: {->}},
-			{want: false, value: {a:->}},
-		}
-		for _, c in ipairs(cases)
-			got = Ord.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Semigroupoid', ->
-	local Semigroupoid, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Semigroupoid, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Semigroupoid))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Semigroupoid', Semigroupoid.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Semigroupoid", Semigroupoid.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: false, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: false, value: {}},
-			{want: false, value: {a:1}},
-			{want: false, value: Array()},
-			{want: false, value: StrMap()},
-			{want: true, value: math.abs},
-			{want: false, value: callable},
-			{want: true, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Semigroupoid.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Category', ->
-	local Category, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Category, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Category))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Category', Category.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Category", Category.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: false, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: false, value: {}},
-			{want: false, value: {a:1}},
-			{want: false, value: Array()},
-			{want: false, value: StrMap()},
-			{want: true, value: math.abs},
-			{want: false, value: callable},
-			{want: true, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Category.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Semigroup', ->
-	local Semigroup, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Semigroup, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Semigroup))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Semigroup', Semigroup.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Semigroup", Semigroup.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: true, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: false, value: math.abs},
-			{want: true, value: callable},
-			{want: false, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Semigroup.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Monoid', ->
-	local Monoid, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Monoid, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Monoid))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Monoid', Monoid.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Monoid", Monoid.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: true, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: false, value: math.abs},
-			{want: true, value: callable},
-			{want: false, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Monoid.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Group', ->
-	local Group, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Group, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Group))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Group', Group.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Group", Group.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: false, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: false, value: {}},
-			{want: false, value: {a:1}},
-			{want: false, value: Array()},
-			{want: false, value: StrMap()},
-			{want: false, value: math.abs},
-			{want: false, value: callable},
-			{want: false, value: Callable(callable)},
-
-			-- TODO: implement a custom type that satisfies Group (Sum in sanctuary)
-		}
-		for _, c in ipairs(cases)
-			got = Group.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Filterable', ->
-	local Filterable, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Filterable, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Filterable))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Filterable', Filterable.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Filterable", Filterable.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: false, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: false, value: math.abs},
-			{want: true, value: callable},
-			{want: false, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Filterable.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
-
-describe 'Functor', ->
-	local Functor, Array, Callable, StrMap, identifier_of
-
-	setup ->
-		{:Array, :Callable, :Functor, :StrMap} = require 'alma.type-classes'
-		{:identifier_of} = require 'alma.type-identifiers'
-
-	it 'is a TypeClass', ->
-		assert.are.equal('alma.type-classes/TypeClass@1', identifier_of(Functor))
-
-	it 'has the expected name', ->
-		assert.are.equal('alma.type-classes/Functor', Functor.name)
-
-	it 'has the expected url', ->
-		assert.matches("https://github%.com/mna/alma/tree/v%d%.%d%.%d/alma/type%-classes#Functor", Functor.url)
-
-	it 'accepts expected values', ->
-		callable = setmetatable({}, {__call: -> true})
-		cases = {
-			{want: false, value: nil},
-			{want: false, value: io.stdout},
-			{want: false, value: coroutine.create(->)},
-			{want: false, value: ''},
-			{want: false, value: 0},
-			{want: false, value: true},
-			{want: true, value: {}},
-			{want: true, value: {a:1}},
-			{want: true, value: Array()},
-			{want: true, value: StrMap()},
-			{want: true, value: math.abs},
-			{want: true, value: callable},
-			{want: true, value: Callable(callable)},
-		}
-		for _, c in ipairs(cases)
-			got = Functor.test(c.value)
-			assert.are.equal(c.want, got, "tested value: #{inspect(c.value)}")
+spec_for('Functor', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: true, value: math.abs},
+		{want: true, value: callable},
+		{want: true, value: Callable(callable)},
+	})
 
 describe 'equals', ->
 	local Z

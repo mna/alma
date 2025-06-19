@@ -24,4 +24,8 @@ local M
 	M.map = (f) ->
 		(x) -> f(@(x))
 
+  -- Function.promap :: (b -> c) ~> (a -> b, c -> d) -> (a -> d)
+	M.promap = (f, g) =>
+		(x) -> g(@(f(x)))
+
 	M

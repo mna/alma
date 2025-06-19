@@ -370,6 +370,18 @@ M.Bifunctor = TypeClass__factory('Bifunctor', {
     implementations = { }
   }
 })
+M.Profunctor = TypeClass__factory('Profunctor', {
+  M.Functor
+}, {
+  {
+    name = 'promap',
+    location = Value,
+    arity = 2,
+    implementations = {
+      Function = Function.promap
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -435,5 +447,8 @@ do
 end
 do
   M.bimap = M.Bifunctor.methods.bimap
+end
+do
+  M.promap = M.Profunctor.methods.promap
 end
 return M

@@ -341,6 +341,17 @@ M.Bifunctor = TypeClass__factory('Bifunctor', {M.Functor}, {
 	},
 })
 
+M.Profunctor = TypeClass__factory('Profunctor', {M.Functor}, {
+	{
+		name: 'promap',
+		location: Value,
+		arity: 2,
+		implementations: {
+			Function: Function.promap,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -400,5 +411,8 @@ do
 
 do
 	M.bimap = M.Bifunctor.methods.bimap
+
+do
+	M.promap = M.Profunctor.methods.promap
 
 M

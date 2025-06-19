@@ -23,5 +23,10 @@ return function(Z)
       return f(self(x))
     end
   end
+  M.promap = function(self, f, g)
+    return function(x)
+      return g(self(f(x)))
+    end
+  end
   return M
 end

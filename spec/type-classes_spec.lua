@@ -637,6 +637,118 @@ spec_for('Functor', {
     value = Callable(callable)
   }
 })
+spec_for('Bifunctor', {
+  {
+    want = false,
+    value = nil
+  },
+  {
+    want = false,
+    value = io.stdout
+  },
+  {
+    want = false,
+    value = coroutine.create(function() end)
+  },
+  {
+    want = false,
+    value = ''
+  },
+  {
+    want = false,
+    value = 0
+  },
+  {
+    want = false,
+    value = true
+  },
+  {
+    want = false,
+    value = { }
+  },
+  {
+    want = false,
+    value = {
+      a = 1
+    }
+  },
+  {
+    want = false,
+    value = Array()
+  },
+  {
+    want = false,
+    value = StrMap()
+  },
+  {
+    want = false,
+    value = math.abs
+  },
+  {
+    want = false,
+    value = callable
+  },
+  {
+    want = false,
+    value = Callable(callable)
+  }
+})
+spec_for('Profunctor', {
+  {
+    want = false,
+    value = nil
+  },
+  {
+    want = false,
+    value = io.stdout
+  },
+  {
+    want = false,
+    value = coroutine.create(function() end)
+  },
+  {
+    want = false,
+    value = ''
+  },
+  {
+    want = false,
+    value = 0
+  },
+  {
+    want = false,
+    value = true
+  },
+  {
+    want = false,
+    value = { }
+  },
+  {
+    want = false,
+    value = {
+      a = 1
+    }
+  },
+  {
+    want = false,
+    value = Array()
+  },
+  {
+    want = false,
+    value = StrMap()
+  },
+  {
+    want = true,
+    value = math.abs
+  },
+  {
+    want = false,
+    value = callable
+  },
+  {
+    want = true,
+    value = Callable(callable)
+  }
+})
 describe('equals', function()
   local Z
   setup(function()

@@ -97,5 +97,15 @@ return function(Z)
     end
     return r
   end
+  M.chain = function(self, f)
+    local r = M.Array()
+    for _, v in ipairs(self) do
+      local xs = f(v)
+      for _, x in ipairs(xs) do
+        table.insert(r, x)
+      end
+    end
+    return r
+  end
   return M
 end

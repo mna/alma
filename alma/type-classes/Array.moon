@@ -83,6 +83,15 @@ local M
 				table.insert(r, f(v))
 		r
 
+	-- Array.chain :: Array a ~> (a -> Array b) -> Array b
+	M.chain = (f) =>
+		r = M.Array()
+		for _, v in ipairs(@)
+			xs = f(v)
+			for _, x in ipairs(xs)
+				table.insert(r, x)
+		r
+
 	M
 
 		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
@@ -109,17 +118,6 @@ local M
 		--   }
 		--   return result;
 		-- };
-		--
-		-- //  Array$prototype$chain :: Array a ~> (a -> Array b) -> Array b
-		-- function Array$prototype$chain(f) {
-		--   const result = [];
-		--   for (let idx = 0; idx < this.length; idx += 1) {
-		--     for (let idx2 = 0, xs = f (this[idx]); idx2 < xs.length; idx2 += 1) {
-		--       result.push (xs[idx2]);
-		--     }
-		--   }
-		--   return result;
-		-- }
 		--
 		-- //  Array$prototype$alt :: Array a ~> Array a -> Array a
 		-- const Array$prototype$alt = Array$prototype$concat;

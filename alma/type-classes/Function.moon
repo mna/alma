@@ -32,4 +32,12 @@ local M
 	M.ap = (f) =>
 		(x) -> f(x)(@(x))
 
+  -- Function.of :: b -> (a -> b)
+	M.of = (x) ->
+		-> x
+
+  -- Function.chain :: (a -> b) ~> (b -> a -> c) -> (a -> c)
+	M.chain = (f) =>
+		(x) -> f(@(x))(x)
+
 	M

@@ -33,5 +33,15 @@ return function(Z)
       return f(x)(self(x))
     end
   end
+  M.of = function(x)
+    return function()
+      return x
+    end
+  end
+  M.chain = function(self, f)
+    return function(x)
+      return f(self(x))(x)
+    end
+  end
   return M
 end

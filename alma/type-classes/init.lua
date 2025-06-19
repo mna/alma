@@ -396,6 +396,32 @@ M.Apply = TypeClass__factory('Apply', {
     }
   }
 })
+M.Applicative = TypeClass__factory('Applicative', {
+  M.Apply
+}, {
+  {
+    name = 'of',
+    location = Constructor,
+    arity = 1,
+    implementations = {
+      Array = Array.of,
+      Function = Function.of
+    }
+  }
+})
+M.Chain = TypeClass__factory('Chain', {
+  M.Apply
+}, {
+  {
+    name = 'chain',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.chain,
+      Function = Function.chain
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -467,5 +493,11 @@ do
 end
 do
   M.ap = M.Apply.methods.ap
+end
+do
+  M.of = M.Applicative.methods.of
+end
+do
+  M.chain = M.Chain.methods.chain
 end
 return M

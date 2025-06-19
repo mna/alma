@@ -365,6 +365,30 @@ M.Apply = TypeClass__factory('Apply', {M.Functor}, {
 	},
 })
 
+M.Applicative = TypeClass__factory('Applicative', {M.Apply}, {
+	{
+		name: 'of',
+		location: Constructor,
+		arity: 1,
+		implementations: {
+			Array: Array.of,
+			Function: Function.of,
+		},
+	},
+})
+
+M.Chain = TypeClass__factory('Chain', {M.Apply}, {
+	{
+		name: 'chain',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.chain,
+			Function: Function.chain,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -430,5 +454,11 @@ do
 
 do
 	M.ap = M.Apply.methods.ap
+
+do
+	M.of = M.Applicative.methods.of
+
+do
+	M.chain = M.Chain.methods.chain
 
 M

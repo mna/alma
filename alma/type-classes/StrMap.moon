@@ -84,17 +84,16 @@ sorted_keys = (o) ->
 			r[k] = f(v)
 		r
 
+  -- StrMap.ap :: StrMap a ~> StrMap (a -> b) -> StrMap b
+	M.ap = (other) =>
+		r = M.StrMap()
+		for k, v in pairs(@)
+			if other[k] != nil
+				r[k] = other[k](v)
+		r
+
 	M
 
-  -- //  Object$prototype$ap :: StrMap a ~> StrMap (a -> b) -> StrMap b
-  -- function Object$prototype$ap(other) {
-  --   const result = {};
-  --   (Object.keys (this)).forEach (k => {
-  --     if (has (k, other)) result[k] = other[k] (this[k]);
-  --   });
-  --   return result;
-  -- }
-  --
   -- //  Object$prototype$alt :: StrMap a ~> StrMap a -> StrMap a
   -- const Object$prototype$alt = Object$prototype$concat;
   --

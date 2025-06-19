@@ -88,5 +88,14 @@ return function(Z)
     end
     return r
   end
+  M.ap = function(self, fs)
+    local r = M.Array()
+    for _, f in ipairs(fs) do
+      for _, v in ipairs(self) do
+        table.insert(r, f(v))
+      end
+    end
+    return r
+  end
   return M
 end

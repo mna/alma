@@ -749,6 +749,62 @@ spec_for('Profunctor', {
     value = Callable(callable)
   }
 })
+spec_for('Apply', {
+  {
+    want = false,
+    value = nil
+  },
+  {
+    want = false,
+    value = io.stdout
+  },
+  {
+    want = false,
+    value = coroutine.create(function() end)
+  },
+  {
+    want = false,
+    value = ''
+  },
+  {
+    want = false,
+    value = 0
+  },
+  {
+    want = false,
+    value = true
+  },
+  {
+    want = true,
+    value = { }
+  },
+  {
+    want = true,
+    value = {
+      a = 1
+    }
+  },
+  {
+    want = true,
+    value = Array()
+  },
+  {
+    want = true,
+    value = StrMap()
+  },
+  {
+    want = true,
+    value = math.abs
+  },
+  {
+    want = true,
+    value = callable
+  },
+  {
+    want = true,
+    value = Callable(callable)
+  }
+})
 describe('equals', function()
   local Z
   setup(function()

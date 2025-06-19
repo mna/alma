@@ -93,5 +93,14 @@ return function(Z)
     end
     return r
   end
+  M.ap = function(self, other)
+    local r = M.StrMap()
+    for k, v in pairs(self) do
+      if other[k] ~= nil then
+        r[k] = other[k](v)
+      end
+    end
+    return r
+  end
   return M
 end

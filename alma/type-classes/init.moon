@@ -352,6 +352,19 @@ M.Profunctor = TypeClass__factory('Profunctor', {M.Functor}, {
 	},
 })
 
+M.Apply = TypeClass__factory('Apply', {M.Functor}, {
+	{
+		name: 'ap',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.ap,
+			Function: Function.ap,
+			StrMap: StrMap.ap,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -414,5 +427,8 @@ do
 
 do
 	M.promap = M.Profunctor.methods.promap
+
+do
+	M.ap = M.Apply.methods.ap
 
 M

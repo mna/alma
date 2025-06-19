@@ -28,5 +28,10 @@ return function(Z)
       return g(self(f(x)))
     end
   end
+  M.ap = function(self, f)
+    return function(x)
+      return f(x)(self(x))
+    end
+  end
   return M
 end

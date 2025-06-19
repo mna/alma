@@ -382,6 +382,20 @@ M.Profunctor = TypeClass__factory('Profunctor', {
     }
   }
 })
+M.Apply = TypeClass__factory('Apply', {
+  M.Functor
+}, {
+  {
+    name = 'ap',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.ap,
+      Function = Function.ap,
+      StrMap = StrMap.ap
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -450,5 +464,8 @@ do
 end
 do
   M.promap = M.Profunctor.methods.promap
+end
+do
+  M.ap = M.Apply.methods.ap
 end
 return M

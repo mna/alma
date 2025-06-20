@@ -92,6 +92,26 @@ local M
 				table.insert(r, x)
 		r
 
+	M.chain_rec = (f, x) ->
+		result = M.Array()
+		neant = {}
+		todo = {head: x, tail: neant}
+
+		while todo != neant
+			more = neant
+			steps = f(iterationNext, iterationDone, todo.head)
+			for idx = 1, #steps
+				step = steps[idx]
+				if step.done
+					table.insert(result, step.value)
+				else
+					more = {head: step.value, tail: more}
+			todo = todo.tail
+			while more != neant
+				todo = {head: more.head, tail: todo}
+				more = more.tail
+		return result
+
 	M
 
 		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b

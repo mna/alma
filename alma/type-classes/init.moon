@@ -389,6 +389,18 @@ M.Chain = TypeClass__factory('Chain', {M.Apply}, {
 	},
 })
 
+M.ChainRec = TypeClass__factory('ChainRec', {M.Chain}, {
+	{
+		name: 'chain_rec',
+		location: Constructor,
+		arity: 2,
+		implementations: {
+			Array: Array.chainRec,
+			Function: Function.chainRec,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------

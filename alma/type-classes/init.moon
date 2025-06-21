@@ -395,8 +395,8 @@ M.ChainRec = TypeClass__factory('ChainRec', {M.Chain}, {
 		location: Constructor,
 		arity: 2,
 		implementations: {
-			Array: Array.chainRec,
-			Function: Function.chainRec,
+			Array: Array.chain_rec,
+			Function: Function.chain_rec,
 		},
 	},
 })
@@ -472,5 +472,8 @@ do
 
 do
 	M.chain = M.Chain.methods.chain
+
+do
+	M.chain_rec = M.ChainRec.methods.chain_rec
 
 M

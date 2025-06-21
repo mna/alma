@@ -422,6 +422,19 @@ M.Chain = TypeClass__factory('Chain', {
     }
   }
 })
+M.ChainRec = TypeClass__factory('ChainRec', {
+  M.Chain
+}, {
+  {
+    name = 'chain_rec',
+    location = Constructor,
+    arity = 2,
+    implementations = {
+      Array = Array.chain_rec,
+      Function = Function.chain_rec
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -499,5 +512,8 @@ do
 end
 do
   M.chain = M.Chain.methods.chain
+end
+do
+  M.chain_rec = M.ChainRec.methods.chain_rec
 end
 return M

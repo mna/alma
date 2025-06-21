@@ -1,3 +1,8 @@
+local iteration_next, iteration_done
+do
+  local _obj_0 = require('alma.type-classes.internal')
+  iteration_next, iteration_done = _obj_0.iteration_next, _obj_0.iteration_done
+end
 local M
 return function(Z)
   if M ~= nil then
@@ -41,6 +46,15 @@ return function(Z)
   M.chain = function(self, f)
     return function(x)
       return f(self(x))(x)
+    end
+  end
+  M.chain_rec = function(f, x)
+    return function(a)
+      local step = iteration_next(x)
+      while not step.done do
+        step = f(iteration_next, iteration_done, step.value)(a)
+      end
+      return step.value
     end
   end
   return M

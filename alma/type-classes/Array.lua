@@ -1,3 +1,8 @@
+local iteration_next, iteration_done
+do
+  local _obj_0 = require('alma.type-classes.internal')
+  iteration_next, iteration_done = _obj_0.iteration_next, _obj_0.iteration_done
+end
 local M
 return function(Z)
   if M ~= nil then
@@ -106,6 +111,37 @@ return function(Z)
       end
     end
     return r
+  end
+  M.chain_rec = function(f, x)
+    local result = M.Array()
+    local neant = { }
+    local todo = {
+      head = x,
+      tail = neant
+    }
+    while todo ~= neant do
+      local more = neant
+      local steps = f(iteration_next, iteration_done, todo.head)
+      for _, step in ipairs(steps) do
+        if step.done then
+          table.insert(result, step.value)
+        else
+          more = {
+            head = step.value,
+            tail = more
+          }
+        end
+      end
+      todo = todo.tail
+      while more ~= neant do
+        todo = {
+          head = more.head,
+          tail = todo
+        }
+        more = more.tail
+      end
+    end
+    return result
   end
   return M
 end

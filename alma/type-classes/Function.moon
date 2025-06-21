@@ -1,3 +1,5 @@
+{:iteration_next, :iteration_done} = require 'alma.type-classes.internal'
+
 local M
 
 -- return a function that takes the Z module as an argument to avoid circular
@@ -39,5 +41,12 @@ local M
   -- Function.chain :: (a -> b) ~> (b -> a -> c) -> (a -> c)
 	M.chain = (f) =>
 		(x) -> f(@(x))(x)
+
+	M.chain_rec = (f, x) ->
+		(a) ->
+			step = iteration_next(x)
+			while not step.done
+				step = f(iteration_next, iteration_done, step.value)(a)
+			step.value
 
 	M

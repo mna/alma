@@ -1,3 +1,5 @@
+{:iteration_next, :iteration_done} = require 'alma.type-classes.internal'
+
 local M
 
 -- return a function that takes the Z module as an argument to avoid circular
@@ -92,6 +94,7 @@ local M
 				table.insert(r, x)
 		r
 
+	-- Array.chain_rec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
 	M.chain_rec = (f, x) ->
 		result = M.Array()
 		neant = {}
@@ -99,46 +102,23 @@ local M
 
 		while todo != neant
 			more = neant
-			steps = f(iterationNext, iterationDone, todo.head)
-			for idx = 1, #steps
-				step = steps[idx]
+			steps = f(iteration_next, iteration_done, todo.head)
+
+			for _, step in ipairs(steps)
 				if step.done
 					table.insert(result, step.value)
 				else
 					more = {head: step.value, tail: more}
 			todo = todo.tail
+
 			while more != neant
 				todo = {head: more.head, tail: todo}
 				more = more.tail
+
 		return result
 
 	M
 
-		-- //  Array$chainRec :: ((a -> c, b -> c, a) -> Array c, a) -> Array b
-		-- const Array$chainRec = (f, x) => {
-		--   const result = [];
-		--   const nil = {};
-		--   let todo = {head: x, tail: nil};
-		--   while (todo !== nil) {
-		--     let more = nil;
-		--     const steps = f (iterationNext, iterationDone, todo.head);
-		--     for (let idx = 0; idx < steps.length; idx += 1) {
-		--       const step = steps[idx];
-		--       if (step.done) {
-		--         result.push (step.value);
-		--       } else {
-		--         more = {head: step.value, tail: more};
-		--       }
-		--     }
-		--     todo = todo.tail;
-		--     while (more !== nil) {
-		--       todo = {head: more.head, tail: todo};
-		--       more = more.tail;
-		--     }
-		--   }
-		--   return result;
-		-- };
-		--
 		-- //  Array$prototype$alt :: Array a ~> Array a -> Array a
 		-- const Array$prototype$alt = Array$prototype$concat;
 		--

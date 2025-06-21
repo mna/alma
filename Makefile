@@ -21,4 +21,4 @@ lint:
 
 clean:
 	find {spec,alma} -name "*.lua" -type f -delete
-	find {spec,alma} -name "*.out" -type f -delete
+	find {.,spec,alma} -name "*.out" -type f -delete

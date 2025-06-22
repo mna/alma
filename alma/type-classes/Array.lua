@@ -4,6 +4,28 @@ do
   iteration_next, iteration_done = _obj_0.iteration_next, _obj_0.iteration_done
 end
 local M
+local concat
+concat = function(xs)
+  return function(ys)
+    local r = M.Array()
+    for _, v in ipairs(xs) do
+      table.insert(r, v)
+    end
+    for _, v in ipairs(ys) do
+      table.insert(r, v)
+    end
+    return r
+  end
+end
+local pair
+pair = function(x)
+  return function(y)
+    return {
+      x,
+      y
+    }
+  end
+end
 return function(Z)
   if M ~= nil then
     error('alma.type-classes.Array required more than once')
@@ -77,14 +99,7 @@ return function(Z)
     return true
   end
   M.concat = function(self, other)
-    local r = M.Array()
-    for _, v in ipairs(self) do
-      table.insert(r, v)
-    end
-    for _, v in ipairs(other) do
-      table.insert(r, v)
-    end
-    return r
+    return concat(self)(other)
   end
   M.map = function(f)
     local r = M.Array()
@@ -150,6 +165,25 @@ return function(Z)
       acc = f(acc, v)
     end
     return acc
+  end
+  M.traverse = function(self, type_rep, f)
+    local traverse_
+    traverse_ = function(idx, n)
+      local _exp_0 = n
+      if 0 == _exp_0 then
+        return Z.of(type_rep, M.Array())
+      elseif 2 == _exp_0 then
+        return Z.lift2(pair, f(self[idx]), f(self[idx + 1]))
+      else
+        local m = math.floor(n / 4) * 2
+        return Z.lift2(concat, traverse_(idx, m), traverse_(idx + m, n - m))
+      end
+    end
+    if #self % 2 == 1 then
+      return Z.lift2(concat, Z.map(M.of, f(self[1])), traverse_(2, #self - 1))
+    else
+      return traverse_(1, #self)
+    end
   end
   return M
 end

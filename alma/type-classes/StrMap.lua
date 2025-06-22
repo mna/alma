@@ -1,11 +1,16 @@
 local table = require('table')
 local M
-local sorted_keys
-sorted_keys = function(o)
+local unordered_keys
+unordered_keys = function(o)
   local keys = { }
   for k in pairs(o) do
     table.insert(keys, k)
   end
+  return keys
+end
+local sorted_keys
+sorted_keys = function(o)
+  local keys = unordered_keys(o)
   table.sort(keys)
   return keys
 end
@@ -108,6 +113,17 @@ return function(Z)
     return Z.reduce(keys, (function(acc, k)
       return f(acc, self[k])
     end), initial)
+  end
+  M.traverse = function(self, type_rep, f)
+    return Z.reduce(unordered_keys(self), function(applicative, k)
+      return Z.lift2((function(o)
+        return function(v)
+          return M.concat(o, {
+            [k] = v
+          })
+        end
+      end), applicative, f(self[k]))
+    end, Z.of(type_rep, M.StrMap()))
   end
   return M
 end

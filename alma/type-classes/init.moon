@@ -442,6 +442,18 @@ M.Foldable = TypeClass__factory('Foldable', {}, {
 	},
 })
 
+M.Traversable = TypeClass__factory('Traversable', {M.Functor, M.Foldable}, {
+	{
+		name: 'traverse',
+		location: Value,
+		arity: 2,
+		implementations: {
+			Array: Array.traverse,
+			StrMap: StrMap.traverse,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -526,5 +538,8 @@ do
 
 do
 	M.reduce = M.Foldable.methods.reduce
+
+do
+	M.traverse = M.Traversable.methods.traverse
 
 M

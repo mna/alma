@@ -2,6 +2,16 @@
 
 local M
 
+concat = (xs) -> (ys) ->
+	r = M.Array()
+	for _, v in ipairs(xs)
+		table.insert(r, v)
+	for _, v in ipairs(ys)
+		table.insert(r, v)
+	r
+
+pair = (x) -> (y) -> {x, y}
+
 -- return a function that takes the Z module as an argument to avoid circular
 -- dependencies
 (Z) ->
@@ -63,12 +73,7 @@ local M
 
 	-- Array.concat :: Array a ~> Array a -> Array a
 	M.concat = (other) =>
-		r = M.Array()
-		for _, v in ipairs(@)
-			table.insert(r, v)
-		for _, v in ipairs(other)
-			table.insert(r, v)
-		r
+		concat(@)(other)
 
 	-- Array.map :: Array a ~> (a -> b) -> Array b
 	M.map = (f) ->
@@ -127,28 +132,25 @@ local M
 			acc = f(acc, v)
 		acc
 
+	-- Array.traverse :: Applicative f => Array a ~> (TypeRep f, a -> f b) -> f (Array b)
+	M.traverse = (type_rep, f) =>
+		traverse_ = (idx, n) ->
+			switch n
+				when 0
+					Z.of(type_rep, M.Array())
+				when 2
+					Z.lift2(pair, f(@[idx]), f(@[idx + 1]))
+				else
+					m = math.floor(n / 4) * 2
+					Z.lift2(concat, traverse_(idx, m), traverse_(idx + m, n - m))
+
+		if #@ % 2 == 1
+			Z.lift2(concat, Z.map(M.of, f(@[1])), traverse_(2, #@ - 1))
+		else
+			traverse_(1, #@)
+
 	M
 
-		-- //  Array$prototype$traverse :: Applicative f => Array a ~> (TypeRep f, a -> f b) -> f (Array b)
-		-- function Array$prototype$traverse(typeRep, f) {
-		--   const go = (idx, n) => {
-		--     switch (n) {
-		--       case 0: return Z.of (typeRep, []);
-		--       case 2: return Z.lift2 (pair, f (this[idx]), f (this[idx + 1]));
-		--       default: {
-		--         const m = Math.floor (n / 4) * 2;
-		--         return Z.lift2 (concat, go (idx, m), go (idx + m, n - m));
-		--       }
-		--     }
-		--   };
-		--   return this.length % 2 === 1 ?
-		--     Z.lift2 (
-		--       concat,
-		--       Z.map (Array$of, f (this[0])), go (1, this.length - 1)
-		--     ) :
-		--     go (0, this.length);
-		-- }
-		--
 		-- //  Array$prototype$extend :: Array a ~> (Array a -> b) -> Array b
 		-- function Array$prototype$extend(f) {
 		--   return this.map ((_, idx, xs) => f (xs.slice (idx)));

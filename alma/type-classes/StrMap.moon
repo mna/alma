@@ -2,11 +2,16 @@ table = require 'table'
 
 local M
 
--- sorted_keys :: StrMap -> Array String
-sorted_keys = (o) ->
+-- unordered_keys :: StrMap -> Array String
+unordered_keys = (o) ->
 	keys = {}
 	for k in pairs(o)
 		table.insert(keys, k)
+	keys
+
+-- sorted_keys :: StrMap -> Array String
+sorted_keys = (o) ->
+	keys = unordered_keys(o)
 	table.sort(keys)
 	keys
 
@@ -100,20 +105,17 @@ sorted_keys = (o) ->
 		keys = sorted_keys(@)
 		Z.reduce(keys, ((acc, k) -> f(acc, @[k])), initial)
 
-	M
+  -- StrMap.traverse :: Applicative f => StrMap a ~> (TypeRep f, a -> f b) -> f (StrMap b)
+	M.traverse = (type_rep, f) =>
+		Z.reduce(
+			unordered_keys(@),
+			(applicative, k) ->
+				Z.lift2(
+					((o) -> (v) -> M.concat(o, {[k]: v})),
+					applicative,
+					f(@[k])
+				),
+			Z.of(type_rep, M.StrMap())
+		)
 
-  -- //  Object$prototype$traverse :: Applicative f => StrMap a ~> (TypeRep f, a -> f b) -> f (StrMap b)
-  -- function Object$prototype$traverse(typeRep, f) {
-  --   return Object.keys (this)
-  --          .reduce (
-  --            (applicative, k) => (
-  --              Z.lift2 (
-  --                o => v => Object$prototype$concat.call (o, {[k]: v}),
-  --                applicative,
-  --                f (this[k])
-  --              )
-  --            ),
-  --            Z.of (typeRep, {})
-  --          );
-  -- }
-  --
+	M

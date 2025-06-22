@@ -480,6 +480,20 @@ M.Foldable = TypeClass__factory('Foldable', { }, {
     }
   }
 })
+M.Traversable = TypeClass__factory('Traversable', {
+  M.Functor,
+  M.Foldable
+}, {
+  {
+    name = 'traverse',
+    location = Value,
+    arity = 2,
+    implementations = {
+      Array = Array.traverse,
+      StrMap = StrMap.traverse
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -571,5 +585,8 @@ do
 end
 do
   M.reduce = M.Foldable.methods.reduce
+end
+do
+  M.traverse = M.Traversable.methods.traverse
 end
 return M

@@ -92,11 +92,11 @@ sorted_keys = (o) ->
 				r[k] = other[k](v)
 		r
 
+  -- StrMap.alt :: StrMap a ~> StrMap a -> StrMap a
+	M.alt = M.concat
+
 	M
 
-  -- //  Object$prototype$alt :: StrMap a ~> StrMap a -> StrMap a
-  -- const Object$prototype$alt = Object$prototype$concat;
-  --
   -- //  Object$prototype$reduce :: StrMap a ~> ((b, a) -> b, b) -> b
   -- function Object$prototype$reduce(f, initial) {
   --   return sortedKeys (this)

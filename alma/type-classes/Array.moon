@@ -117,11 +117,11 @@ local M
 
 		return result
 
+	-- Array.alt :: Array a ~> Array a -> Array a
+	M.alt = M.concat
+
 	M
 
-		-- //  Array$prototype$alt :: Array a ~> Array a -> Array a
-		-- const Array$prototype$alt = Array$prototype$concat;
-		--
 		-- //  Array$prototype$reduce :: Array a ~> ((b, a) -> b, b) -> b
 		-- function Array$prototype$reduce(f, initial) {
 		--   let acc = initial;

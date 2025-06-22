@@ -401,6 +401,21 @@ M.ChainRec = TypeClass__factory('ChainRec', {M.Chain}, {
 	},
 })
 
+M.Monad = TypeClass__factory('Monad', {M.Applicative, M.Chain}, {})
+
+
+M.Alt = TypeClass__factory('Alt', {M.Functor}, {
+	{
+		name: 'alt',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.alt,
+			StrMap: StrMap.alt,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -475,5 +490,9 @@ do
 
 do
 	M.chain_rec = M.ChainRec.methods.chain_rec
+
+do
+	M.alt = (a, b) ->
+		M.Alt.methods.alt(b, a)
 
 M

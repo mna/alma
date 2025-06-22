@@ -308,6 +308,38 @@ spec_for('ChainRec', {
 		{want: true, value: Callable(callable)},
 	})
 
+spec_for('Monad', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: false, value: {a:1}},
+		{want: true, value: Array()},
+		{want: false, value: StrMap()},
+		{want: true, value: math.abs},
+		{want: true, value: callable},
+		{want: true, value: Callable(callable)},
+	})
+
+spec_for('Alt', {
+		{want: false, value: nil},
+		{want: false, value: io.stdout},
+		{want: false, value: coroutine.create(->)},
+		{want: false, value: ''},
+		{want: false, value: 0},
+		{want: false, value: true},
+		{want: true, value: {}},
+		{want: true, value: {a:1}},
+		{want: true, value: Array()},
+		{want: true, value: StrMap()},
+		{want: false, value: math.abs},
+		{want: true, value: callable},
+		{want: false, value: Callable(callable)},
+	})
+
 describe 'equals', ->
 	local Z
 

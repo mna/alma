@@ -143,5 +143,6 @@ return function(Z)
     end
     return result
   end
+  M.alt = M.concat
   return M
 end

@@ -435,6 +435,23 @@ M.ChainRec = TypeClass__factory('ChainRec', {
     }
   }
 })
+M.Monad = TypeClass__factory('Monad', {
+  M.Applicative,
+  M.Chain
+}, { })
+M.Alt = TypeClass__factory('Alt', {
+  M.Functor
+}, {
+  {
+    name = 'alt',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.alt,
+      StrMap = StrMap.alt
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -515,5 +532,10 @@ do
 end
 do
   M.chain_rec = M.ChainRec.methods.chain_rec
+end
+do
+  M.alt = function(a, b)
+    return M.Alt.methods.alt(b, a)
+  end
 end
 return M

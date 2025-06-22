@@ -102,5 +102,6 @@ return function(Z)
     end
     return r
   end
+  M.alt = M.concat
   return M
 end

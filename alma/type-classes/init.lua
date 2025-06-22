@@ -465,6 +465,10 @@ M.Plus = TypeClass__factory('Plus', {
     }
   }
 })
+M.Alternative = TypeClass__factory('Alternative', {
+  M.Applicative,
+  M.Plus
+}, { })
 do
   local pairs = { }
   M.equals = function(x, y)

@@ -428,6 +428,8 @@ M.Plus = TypeClass__factory('Plus', {M.Alt}, {
 	},
 })
 
+M.Alternative = TypeClass__factory('Alternative', {M.Applicative, M.Plus}, {})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------

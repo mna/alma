@@ -1141,6 +1141,62 @@ spec_for('Plus', {
     value = Callable(callable)
   }
 })
+spec_for('Alternative', {
+  {
+    want = false,
+    value = nil
+  },
+  {
+    want = false,
+    value = io.stdout
+  },
+  {
+    want = false,
+    value = coroutine.create(function() end)
+  },
+  {
+    want = false,
+    value = ''
+  },
+  {
+    want = false,
+    value = 0
+  },
+  {
+    want = false,
+    value = true
+  },
+  {
+    want = true,
+    value = { }
+  },
+  {
+    want = false,
+    value = {
+      a = 1
+    }
+  },
+  {
+    want = true,
+    value = Array()
+  },
+  {
+    want = false,
+    value = StrMap()
+  },
+  {
+    want = false,
+    value = math.abs
+  },
+  {
+    want = true,
+    value = callable
+  },
+  {
+    want = false,
+    value = Callable(callable)
+  }
+})
 describe('equals', function()
   local Z
   setup(function()

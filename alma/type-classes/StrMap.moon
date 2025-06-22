@@ -95,14 +95,13 @@ sorted_keys = (o) ->
   -- StrMap.alt :: StrMap a ~> StrMap a -> StrMap a
 	M.alt = M.concat
 
+  -- StrMap.reduce :: StrMap a ~> ((b, a) -> b, b) -> b
+	M.reduce = (f, initial) =>
+		keys = sorted_keys(@)
+		Z.reduce(keys, ((acc, k) -> f(acc, @[k])), initial)
+
 	M
 
-  -- //  Object$prototype$reduce :: StrMap a ~> ((b, a) -> b, b) -> b
-  -- function Object$prototype$reduce(f, initial) {
-  --   return sortedKeys (this)
-  --          .reduce ((acc, k) => f (acc, this[k]), initial);
-  -- }
-  --
   -- //  Object$prototype$traverse :: Applicative f => StrMap a ~> (TypeRep f, a -> f b) -> f (StrMap b)
   -- function Object$prototype$traverse(typeRep, f) {
   --   return Object.keys (this)

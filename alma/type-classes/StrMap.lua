@@ -103,5 +103,11 @@ return function(Z)
     return r
   end
   M.alt = M.concat
+  M.reduce = function(self, f, initial)
+    local keys = sorted_keys(self)
+    return Z.reduce(keys, (function(acc, k)
+      return f(acc, self[k])
+    end), initial)
+  end
   return M
 end

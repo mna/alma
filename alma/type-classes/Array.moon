@@ -120,15 +120,15 @@ local M
 	-- Array.alt :: Array a ~> Array a -> Array a
 	M.alt = M.concat
 
+	-- Array.reduce :: Array a ~> ((b, a) -> b, b) -> b
+	M.reduce = (f, initial) =>
+		acc = initial
+		for _, v in ipairs(@)
+			acc = f(acc, v)
+		acc
+
 	M
 
-		-- //  Array$prototype$reduce :: Array a ~> ((b, a) -> b, b) -> b
-		-- function Array$prototype$reduce(f, initial) {
-		--   let acc = initial;
-		--   for (let idx = 0; idx < this.length; idx += 1) acc = f (acc, this[idx]);
-		--   return acc;
-		-- }
-		--
 		-- //  Array$prototype$traverse :: Applicative f => Array a ~> (TypeRep f, a -> f b) -> f (Array b)
 		-- function Array$prototype$traverse(typeRep, f) {
 		--   const go = (idx, n) => {

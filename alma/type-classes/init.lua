@@ -469,6 +469,17 @@ M.Alternative = TypeClass__factory('Alternative', {
   M.Applicative,
   M.Plus
 }, { })
+M.Foldable = TypeClass__factory('Foldable', { }, {
+  {
+    name = 'reduce',
+    location = Value,
+    arity = 2,
+    implementations = {
+      Array = Array.reduce,
+      StrMap = StrMap.reduce
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -557,5 +568,8 @@ do
 end
 do
   M.zero = M.Plus.methods.zero
+end
+do
+  M.reduce = M.Foldable.methods.reduce
 end
 return M

@@ -144,5 +144,12 @@ return function(Z)
     return result
   end
   M.alt = M.concat
+  M.reduce = function(self, f, initial)
+    local acc = initial
+    for _, v in ipairs(self) do
+      acc = f(acc, v)
+    end
+    return acc
+  end
   return M
 end

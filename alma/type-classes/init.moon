@@ -430,6 +430,18 @@ M.Plus = TypeClass__factory('Plus', {M.Alt}, {
 
 M.Alternative = TypeClass__factory('Alternative', {M.Applicative, M.Plus}, {})
 
+M.Foldable = TypeClass__factory('Foldable', {}, {
+	{
+		name: 'reduce',
+		location: Value,
+		arity: 2,
+		implementations: {
+			Array: Array.reduce,
+			StrMap: StrMap.reduce,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -511,5 +523,8 @@ do
 
 do
 	M.zero = M.Plus.methods.zero
+
+do
+	M.reduce = M.Foldable.methods.reduce
 
 M

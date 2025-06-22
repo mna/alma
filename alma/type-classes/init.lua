@@ -452,6 +452,19 @@ M.Alt = TypeClass__factory('Alt', {
     }
   }
 })
+M.Plus = TypeClass__factory('Plus', {
+  M.Alt
+}, {
+  {
+    name = 'zero',
+    location = Constructor,
+    arity = 0,
+    implementations = {
+      Array = Array.zero,
+      StrMap = StrMap.zero
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -537,5 +550,8 @@ do
   M.alt = function(a, b)
     return M.Alt.methods.alt(b, a)
   end
+end
+do
+  M.zero = M.Plus.methods.zero
 end
 return M

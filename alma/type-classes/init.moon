@@ -416,6 +416,18 @@ M.Alt = TypeClass__factory('Alt', {M.Functor}, {
 	},
 })
 
+M.Plus = TypeClass__factory('Plus', {M.Alt}, {
+	{
+		name: 'zero',
+		location: Constructor,
+		arity: 0,
+		implementations: {
+			Array: Array.zero,
+			StrMap: StrMap.zero,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -494,5 +506,8 @@ do
 do
 	M.alt = (a, b) ->
 		M.Alt.methods.alt(b, a)
+
+do
+	M.zero = M.Plus.methods.zero
 
 M

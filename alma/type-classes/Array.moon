@@ -1,4 +1,5 @@
 {:iteration_next, :iteration_done} = require 'alma.type-classes.internal'
+{:table_unpack} = require 'alma.compat'
 
 local M
 
@@ -76,7 +77,7 @@ pair = (x) -> (y) -> {x, y}
 		concat(@)(other)
 
 	-- Array.map :: Array a ~> (a -> b) -> Array b
-	M.map = (f) ->
+	M.map = (f) =>
 		r = M.Array()
 		for _, v in ipairs(@)
 			table.insert(r, (f(v)))
@@ -149,10 +150,12 @@ pair = (x) -> (y) -> {x, y}
 		else
 			traverse_(1, #@)
 
-	M
+	-- Array.extend :: Array a ~> (Array a -> b) -> Array b
+	M.extend = (f) =>
+		r = M.Array()
+		for i = 1, #@
+			rest = table_unpack(@, i)
+			table.insert(r, f(rest))
+		r
 
-		-- //  Array$prototype$extend :: Array a ~> (Array a -> b) -> Array b
-		-- function Array$prototype$extend(f) {
-		--   return this.map ((_, idx, xs) => f (xs.slice (idx)));
-		-- }
-		--
+	M

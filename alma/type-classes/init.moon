@@ -454,6 +454,18 @@ M.Traversable = TypeClass__factory('Traversable', {M.Functor, M.Foldable}, {
 	},
 })
 
+M.Extend = TypeClass__factory('Extend', {M.Functor}, {
+	{
+		name: 'extend',
+		location: Value,
+		arity: 1,
+		implementations: {
+			Array: Array.extend,
+			Function: Function.extend,
+		},
+	},
+})
+
 -- -------------------------------------------
 -- Fantasy-Land functions for each type class
 -- -------------------------------------------
@@ -541,5 +553,8 @@ do
 
 do
 	M.traverse = M.Traversable.methods.traverse
+
+do
+	M.extend = M.Extend.methods.extend
 
 M

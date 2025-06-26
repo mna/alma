@@ -49,4 +49,8 @@ local M
 				step = f(iteration_next, iteration_done, step.value)(a)
 			step.value
 
+  -- Function.extend :: Semigroup a => (a -> b) ~> ((a -> b) -> c) -> (a -> c)
+	M.extend = (f) =>
+		(x) -> f((y) -> @(Z.concat(x, y)))
+
 	M

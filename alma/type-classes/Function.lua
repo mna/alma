@@ -57,5 +57,12 @@ return function(Z)
       return step.value
     end
   end
+  M.extend = function(self, f)
+    return function(x)
+      return f(function(y)
+        return self(Z.concat(x, y))
+      end)
+    end
+  end
   return M
 end

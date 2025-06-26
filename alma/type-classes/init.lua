@@ -494,6 +494,19 @@ M.Traversable = TypeClass__factory('Traversable', {
     }
   }
 })
+M.Extend = TypeClass__factory('Extend', {
+  M.Functor
+}, {
+  {
+    name = 'extend',
+    location = Value,
+    arity = 1,
+    implementations = {
+      Array = Array.extend,
+      Function = Function.extend
+    }
+  }
+})
 do
   local pairs = { }
   M.equals = function(x, y)
@@ -588,5 +601,8 @@ do
 end
 do
   M.traverse = M.Traversable.methods.traverse
+end
+do
+  M.extend = M.Extend.methods.extend
 end
 return M

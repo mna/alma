@@ -3,6 +3,8 @@ do
   local _obj_0 = require('alma.type-classes.internal')
   iteration_next, iteration_done = _obj_0.iteration_next, _obj_0.iteration_done
 end
+local table_unpack
+table_unpack = require('alma.compat').table_unpack
 local M
 local concat
 concat = function(xs)
@@ -101,7 +103,7 @@ return function(Z)
   M.concat = function(self, other)
     return concat(self)(other)
   end
-  M.map = function(f)
+  M.map = function(self, f)
     local r = M.Array()
     for _, v in ipairs(self) do
       table.insert(r, (f(v)))
@@ -184,6 +186,14 @@ return function(Z)
     else
       return traverse_(1, #self)
     end
+  end
+  M.extend = function(self, f)
+    local r = M.Array()
+    for i = 1, #self do
+      local rest = table_unpack(self, i)
+      table.insert(r, f(rest))
+    end
+    return r
   end
   return M
 end

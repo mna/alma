@@ -20,7 +20,7 @@ jobs:
           luaVersion: ${{ matrix.lua-version }}
 
       - name: Install LuaRocks
-        uses: leafo/gh-actions-luarocks@v5
+        uses: leafo/gh-actions-luarocks@v6
         with:
           luarocksVersion: "3.11.1"
 
